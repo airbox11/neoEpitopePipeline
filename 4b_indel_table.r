@@ -2,16 +2,14 @@ library(stringr)
 library(biomaRt)
 
 args1 <- commandArgs(trailingOnly = TRUE)
-runID <- args1[1]
-
+workDir <- args1[1]
 
 
 ### for test:
-# runID <- 'K26K-HGXQVM-metastasis22-01'
-# runID <- 'LF89'
-# runID <- 'VG53'
+# workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/promise/output_datasets/S014-2CDKKU/'
+# workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/EB72'
 ### test end
-setwd(paste('/icgc/dkfzlsdf/analysis/D120/yanhong/all_in_one_pipeline_collection/mhc4.1/', runID, '/4_indel_based_prediction/result',sep = ''))
+setwd(paste(workDir,'4_indel_based_prediction/result',sep = '/'))
 
 # ensembl <- useEnsembl(biomart = "genes", dataset = "hsapiens_gene_ensembl")
 old_mart <- useMart(biomart="ENSEMBL_MART_ENSEMBL",
@@ -151,15 +149,6 @@ get_tb <- function (type) {
     }
     
     mu_ref_classify <- function(tb1){
-      # if(is.null(dim(tb1))){
-      #   peps <- tb1[2]
-      #   peps2 <- peps[sapply(peps, check_indel,USE.NAMES = FALSE)]
-      #   if (tb1[2] %in% peps2){
-      #     return(tb1)
-      #   }else{
-      #     return('')
-      #   }
-      # }else{
         peps <- unique(tb1[,2])
         peps2 <- peps[sapply(peps, check_indel,USE.NAMES = FALSE)]
         tb2 <- tb1[tb1[,2] %in% peps2,]
@@ -167,7 +156,6 @@ get_tb <- function (type) {
           return(NULL)
         }
         return(tb2)
-      # }
     }
     
     ## execution
@@ -217,8 +205,10 @@ get_tb <- function (type) {
 f2 <- list.files('../', pattern = '.*\\.vcf')[1]
 f2 <- paste('../', f2, sep = '')
 indelInfo <- read.table(f2, stringsAsFactors = FALSE, sep = '\t',
-                        comment.char = ""
-                        )[,c(2,4,5,17,18)]
+                        comment.char = "",
+                        header = TRUE
+                        )[,c('POS', 'REF', 'ALT', 'ANNOVAR_FUNCTION', 'GENE')]
+indelInfo$GENE <- str_match(indelInfo$GENE, pattern = '([^(]+)\\(?.*')[,2]
 colnames(indelInfo) <- c('indel_position','reference','mutation','genomic_location','gene')
 tb.geneID <- getBM(attributes = c("ensembl_gene_id", "external_gene_name"), 
                    filters = "external_gene_name", 

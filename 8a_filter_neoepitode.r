@@ -7,30 +7,25 @@ library(biomaRt)
 
 args1 <- commandArgs(trailingOnly = TRUE)
 
-## for test: =========================
-# workDir <- '/icgc/dkfzlsdf/analysis/D120/yanhong/all_in_one_pipeline_collection/mhc4.1/K26K-HGXQVM-metastasis22-01'
-# args1 <- c("netMHCpanID","K26K-HGXQVM-metastasis22-01",workDir,"RNAseq","Yes")
-###
-# workDir <- '/icgc/dkfzlsdf/analysis/D120/yanhong/all_in_one_pipeline_collection/mhc4.1/S2914Nr4'
-# args1 <- c("S2914Nr4","MD63",workDir,"RNAseq","Yes")
-###
-# workDir <- '/icgc/dkfzlsdf/analysis/D120/yanhong/all_in_one_pipeline_collection/mhc4.1/S3005Nr1/'
-# args1 <- c("S3005Nr1","GO53",workDir,"TCGA-LIHC","No")
-###
-# args1 <- c('netMHCpanID','K26K-MK6UTZ','/icgc/dkfzlsdf/analysis/D120/yanhong/all_in_one_pipeline_collection/mhc4.1/K26K-MK6UTZ','TCGA-BRCA','No')
-### EB72, net4.1 & stabPan 
-# workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/EB72'
-# args1 <- c("netMHCstabpan", workDir,"RNAseq")
-# args1 <- c("netMHCstabpan", workDir,"TCGA-READ")
-## end of test =========================
 
 netMHCpanID <- args1[1]
 workDir <- args1[2]
 tcga <- args1[3]
+
+
+## for test: =========================
+# netMHCpanID <- 'netMHCpan4_1'
+# workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/EH63_cell-line01'
+# tcga <- 'RNAseq'
+## end of test =========================
 setwd(workDir)
 
 inputMHCI  <- paste(workDir, '/3_add_expression/MHCI_epitopes_', tcga, '_', netMHCpanID, '.tab', sep = '')
 inputMHCII <- paste(workDir, '/3_add_expression/MHCII_epitopes_', tcga, '.tab', sep = '')
+
+columns_table <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline/columns_table.csv'
+ct.df <- read.table(file = columns_table, sep = '\t', header = TRUE, stringsAsFactors = FALSE, fill = TRUE)
+
 old_mart <- useMart(biomart="ENSEMBL_MART_ENSEMBL",
                     host="grch37.ensembl.org",
                     path="/biomart/martservice",
@@ -75,25 +70,19 @@ get_pos <- function(ref, mut,gene){
 }
 
 if (netMHCpanID == 'netMHCstabpan') {
-    mhc1.rna.select <- c('GENE', 'FPKM', 'MHC', 'Peptide', 'Identity', 'Pred', 'Thalf.h.', 'X.Rank_Stab', 'X1.log50k', 'Aff.nM.', 'X.Rank_aff', 'Combined', 'Combined_.rank', 'BindLevel', 'Peptide.1', 'Identity.1', 'Pred.1', 'Thalf.h..1', 'X.Rank_Stab.1', 'X1.log50k.1', 'Aff.nM..1', 'X.Rank_aff.1', 'Combined.1', 'Combined_.rank.1', 'BindLevel.1', 'NM_accessions', 'aaChange', 'sumReads', 'numOfBaseExp', 'dna_freAlt', 'dna_cov', 'freRef', 'freAlt', 'expAlt')
-    mhc1.rna.rename <- c('Gene', 'FPKM', 'MHC allele', 'Mutant peptide', 'Identity_mut', 'Pred_mut', 'Thalf.h_mut', 'Rank_Stab_mut', 'log50k_mut', 'Aff.nM_mut', 'Rank_aff_mut', 'Combined_mut', 'Combined_rank_mut', 'BindLevel_mut', 'Wildtype peptide', 'Identity_wt', 'Pred_wt', 'Thalf.h_wt', 'Rank_Stab_wt', 'log50k_wt', 'Aff.nM_wt', 'Rank_aff_wt', 'Combined_wt', 'Combined_rank_wt', 'BindLevel_wt', 'GenBank_entry_mRNA', 'aaChange', 'sumReads', 'numOfBaseExp', 'dna_freAlt', 'dna_cov', 'freRef', 'freAlt', 'expAlt')
-    mhc1.rna.reorder <- c('Gene', 'MHC allele', 'aaChange', 'Epitope_length', 'Mutant peptide', 'Identity_mut', 'Pred_mut', 'Thalf.h_mut', 'Rank_Stab_mut', 'log50k_mut', 'Aff.nM_mut', 'Rank_aff_mut', 'Combined_mut', 'Combined_rank_mut', 'BindLevel_mut', 'Wildtype peptide', 'Identity_wt', 'Pred_wt', 'Thalf.h_wt', 'Rank_Stab_wt', 'log50k_wt', 'Aff.nM_wt', 'Rank_aff_wt', 'Combined_wt', 'Combined_rank_wt', 'BindLevel_wt', 'Mut_pos_epitope', 'Epi_pos_in_longpep', 'Mutant_long_peptide', 'WildType_long_peptide', 'geneID', 'GenBank_entry_mRNA', 'FPKM', 'sumReads', 'numOfBaseExp', 'dna_freAlt', 'dna_cov', 'freRef', 'freAlt', 'expAlt')
-
-    mhc1.tcga.select <- c('GENE', 'MHC', 'Peptide', 'Identity', 'Pred', 'Thalf.h.', 'X.Rank_Stab', 'X1.log50k', 'Aff.nM.', 'X.Rank_aff', 'Combined', 'Combined_.rank', 'BindLevel', 'Peptide.1', 'Identity.1', 'Pred.1', 'Thalf.h..1', 'X.Rank_Stab.1', 'X1.log50k.1', 'Aff.nM..1', 'X.Rank_aff.1', 'Combined.1', 'Combined_.rank.1', 'BindLevel.1', 'NM_accessions', 'aaChange', 'mutFre', 'GeneID', 'Mean', 'Median')
-
-    mhc1.tcga.rename <- c('Gene','MHC allele','Mutant peptide','Identity_mut','Pred_mut','Thalf.h_mut','Rank_Stab_mut','log50k_mut','Aff.nM_mut','Rank_aff_mut','Combined_mut','Combined_rank_mut','BindLevel_mut','Wildtype peptide','Identity_wt','Pred_wt','Thalf.h_wt','Rank_Stab_wt','log50k_wt','Aff.nM_wt','Rank_aff_wt','Combined_wt','Combined_rank_wt','BindLevel_wt','GenBank_entry_mRNA','aaChange','mut_freq','GeneID','Mean','Median')
-
-    mhc1.tcga.reorder <- c('Gene', 'MHC allele', 'aaChange', 'Epitope_length', 'Mut_pos_epitope', 'Mutant peptide', 'Identity_mut', 'Pred_mut', 'Thalf.h_mut', 'Rank_Stab_mut', 'log50k_mut', 'Aff.nM_mut', 'Rank_aff_mut', 'Combined_mut', 'Combined_rank_mut', 'BindLevel_mut', 'Wildtype peptide', 'Identity_wt', 'Pred_wt', 'Thalf.h_wt', 'Rank_Stab_wt', 'log50k_wt', 'Aff.nM_wt', 'Rank_aff_wt', 'Combined_wt', 'Combined_rank_wt', 'BindLevel_wt', 'Epi_pos_in_longpep', 'Mutant_long_peptide', 'WildType_long_peptide', 'GeneID', 'GenBank_entry_mRNA', 'mut_freq', 'Mean', 'Median')
+    mhc1.rna.select <- ct.df$mhc1.stab.rna.select[ct.df$mhc1.stab.rna.select != ""]
+    mhc1.rna.rename <- ct.df$mhc1.stab.rna.rename[ct.df$mhc1.stab.rna.rename != ""]
+    mhc1.rna.reorder <- ct.df$mhc1.stab.rna.reorder[ct.df$mhc1.stab.rna.reorder != ""]
+    mhc1.tcga.select <- ct.df$mhc1.stab.tcga.select[ct.df$mhc1.stab.tcga.select != ""]
+    mhc1.tcga.rename <- ct.df$mhc1.stab.tcga.rename[ct.df$mhc1.stab.tcga.rename != ""]
+    mhc1.tcga.reorder <- ct.df$mhc1.stab.tcga.reorder[ct.df$mhc1.stab.tcga.reorder != ""]
 }else if (netMHCpanID == 'netMHCpan4_1') {
-    mhc1.rna.select <- c('GENE', 'MHC', 'Peptide', 'Score_EL', 'X.Rank_EL', 'Score_BA', 'X.Rank_BA', 'Aff.nM.', 'BindLevel', 'Peptide.1', 'Score_EL.1', 'X.Rank_EL.1', 'Score_BA.1', 'X.Rank_BA.1', 'Aff.nM..1', 'BindLevel.1', 'NM_accessions', 'aaChange', 'FPKM', 'sumReads', 'numOfBaseExp', 'dna_freAlt', 'dna_cov', 'freRef', 'freAlt', 'expAlt')
-    mhc1.rna.rename <- c('Gene', 'MHC allele', 'Mutant peptide', 'Score_EL_mut', 'Rank_EL_Mut', 'Score_BA_mut', 'Rank_BA_mut', 'Aff.nM_mut', 'BindLevel_mut', 'Wildtype peptide', 'Score_EL_wt', 'Rank_EL_wt', 'Score_BA_wt', 'Rank_BA_wt', 'Aff.nM_wt', 'BindLevel_wt', 'GenBank_entry_mRNA', 'aaChange','FPKM', 'sumReads', 'numOfBaseExp', 'dna_freAlt', 'dna_cov', 'freRef', 'freAlt', 'expAlt')
-    mhc1.rna.reorder <- c('Gene', 'MHC allele', 'Mutant peptide', 'aaChange', 'Epitope_length', 'Mut_pos_epitope', 'Score_EL_mut', 'Rank_EL_Mut', 'Score_BA_mut', 'Rank_BA_mut', 'Aff.nM_mut', 'BindLevel_mut', 'Wildtype peptide', 'Score_EL_wt', 'Rank_EL_wt', 'Score_BA_wt', 'Rank_BA_wt', 'Aff.nM_wt', 'BindLevel_wt', 'Epi_pos_in_longpep', 'Mutant_long_peptide', 'WildType_long_peptide','geneID', 'GenBank_entry_mRNA', 'FPKM','sumReads', 'numOfBaseExp', 'dna_freAlt', 'dna_cov', 'freRef', 'freAlt', 'expAlt')
-
-    mhc1.tcga.select <- c('GENE', 'MHC', 'Peptide', 'Score_EL', 'X.Rank_EL', 'Score_BA', 'X.Rank_BA', 'Aff.nM.', 'BindLevel', 'Peptide.1', 'Score_EL.1', 'X.Rank_EL.1', 'Score_BA.1', 'X.Rank_BA.1', 'Aff.nM..1', 'BindLevel.1', 'NM_accessions', 'aaChange', 'mutFre', 'GeneID', 'Mean', 'Median')
-    mhc1.tcga.rename <- c('Gene', 'MHC allele', 'Mutant peptide', 'Score_EL_mut', 'Rank_EL_Mut', 'Score_BA_mut', 'Rank_BA_mut', 'Aff.nM_mut', 'BindLevel_mut', 'Wildtype peptide', 'Score_EL_wt', 'Rank_EL_wt', 'Score_BA_wt', 'Rank_BA_wt', 'Aff.nM_wt', 'BindLevel_wt', 'GenBank_entry_mRNA', 'aaChange', 'mut_freq', 'GeneID', 'Mean', 'Median')
-    mhc1.tcga.reorder <- c('Gene', 'MHC allele', 'Mutant peptide', 'aaChange', 'Epitope_length', 'Mut_pos_epitope', 'Score_EL_mut', 'Rank_EL_Mut', 'Score_BA_mut', 'Rank_BA_mut', 'Aff.nM_mut', 'BindLevel_mut', 'Wildtype peptide', 'Score_EL_wt', 'Rank_EL_wt', 'Score_BA_wt', 'Rank_BA_wt', 'Aff.nM_wt', 'BindLevel_wt', 'Epi_pos_in_longpep', 'Mutant_long_peptide', 'WildType_long_peptide', 'GeneID', 'GenBank_entry_mRNA', 'mut_freq', 'Mean', 'Median')
-
-
+    mhc1.rna.select <- ct.df$mhc1.rna.select[ct.df$mhc1.rna.select != ""]
+    mhc1.rna.rename <- ct.df$mhc1.rna.rename[ct.df$mhc1.rna.rename != ""]
+    mhc1.rna.reorder <- ct.df$mhc1.rna.reorder[ct.df$mhc1.rna.reorder != ""]
+    mhc1.tcga.select <- ct.df$mhc1.tcga.select[ct.df$mhc1.tcga.select != ""]
+    mhc1.tcga.rename <- ct.df$mhc1.tcga.rename[ct.df$mhc1.tcga.rename != ""]
+    mhc1.tcga.reorder <- ct.df$mhc1.tcga.reorder[ct.df$mhc1.tcga.reorder != ""]
 }
 
 filter_tcga_RNAseq_mhc1 <- function(){
@@ -117,13 +106,6 @@ filter_tcga_RNAseq_mhc1 <- function(){
                  (f4$BindLevel_mut == 'nonB' & f4$Aff.nM_mut <= 1000 ), ]
 
     if (tcga == 'RNAseq'){
-        geneID <- getBM(attributes = c("ensembl_gene_id", "external_gene_name"), 
-                        filters = "external_gene_name", 
-                        values = f5$Gene,
-                        useCache = FALSE,
-                        mart = old_mart)
-        colnames(geneID) <- c('geneID', 'Gene')
-        f5 <- merge(f5, geneID, by.x = 'Gene', by.y = 'Gene', all.x = TRUE)
         f6 <- f5[,mhc1.rna.reorder]
         f6 <- f6[!is.na(f5$Gene),]
         f6$freAlt <- as.numeric(as.character(f6$freAlt))
@@ -138,17 +120,12 @@ filter_tcga_RNAseq_mhc1 <- function(){
     write.table(f6, file = paste(workDir, '/8_chose_neoepitode/MHCI_epitopes_',tcga, '_', netMHCpanID, '.tab',sep = ''), sep = '\t', row.names = FALSE, col.names = TRUE, quote = FALSE)
 }
 
-
-
-
-mhc2.rna.select <- c('GENE', 'HLA', 'Peptide','Core', 'Affinity.nM.', 'X.Rank', 'BindingLevel_mut', 'Peptide.1','Core.1', 'Affinity.nM..1', 'X.Rank.1', 'BindingLevel_ref', 'NM_accessions', 'aaChange', 'sumReads', 'numOfBaseExp', 'dna_freAlt', 'dna_cov', 'freRef', 'freAlt', 'expAlt', 'TPM', 'FPKM')
-mhc2.rna.rename <- c('Gene', 'MHC allele', 'Mutant peptide','9mer_core_mut', 'Aff.nM_mut', 'Rank_mut', 'BindLevel_mut', 'Wildtype peptide','9mer_core_wt', 'Aff.nM_wt', 'Rank_wt', 'BindLevel_wt', 'GenBank_entry_mRNA', 'aaChange', 'sumReads', 'numOfBaseExp', 'dna_freAlt', 'dna_cov', 'freRef', 'freAlt', 'expAlt', 'TPM', 'FPKM')
-mhc2.rna.reorder <- c('Gene', 'MHC allele', 'Mutant peptide', 'aaChange', 'Epitope_length', 'Mut_pos_epitope','9mer_core_mut', 'Aff.nM_mut', 'Rank_mut', 'BindLevel_mut', 'Wildtype peptide','9mer_core_wt', 'Aff.nM_wt', 'Rank_wt', 'BindLevel_wt',  'WildType_long_peptide', 'Mutant_long_peptide', 'Epi_pos_in_longpep', 'geneID', 'GenBank_entry_mRNA', 'TPM', 'FPKM', 'sumReads', 'numOfBaseExp', 'dna_freAlt', 'dna_cov', 'freRef', 'freAlt', 'expAlt')
-
-mhc2.tcga.select <- c('GENE', 'HLA', 'Peptide','Core', 'Affinity.nM.', 'X.Rank', 'BindingLevel_mut', 'Peptide.1','Core.1', 'Affinity.nM..1', 'X.Rank.1', 'BindingLevel_ref', 'NM_accessions', 'aaChange', 'mutFre', 'GeneID', 'Mean', 'Median')
-mhc2.tcga.rename <- c('Gene', 'MHC allele', 'Mutant peptide', '9mer_core_mut', 'Aff.nM_mut', 'Rank_mut', 'BindLevel_mut', 'Wildtype peptide','9mer_core_wt', 'Aff.nM_wt', 'Rank_wt', 'BindLevel_wt', 'GenBank_entry_mRNA', 'aaChange', 'mut_freq', 'GeneID', 'Mean', 'Median')
-mhc2.tcga.reorder <- c('Gene', 'MHC allele', 'aaChange', 'Epitope_length', 'Mut_pos_epitope', 'Mutant peptide','9mer_core_mut', 'Aff.nM_mut', 'Rank_mut', 'BindLevel_mut', 'Wildtype peptide','9mer_core_wt', 'Aff.nM_wt', 'Rank_wt', 'BindLevel_wt', 'mut_freq', 'WildType_long_peptide', 'Mutant_long_peptide', 'Epi_pos_in_longpep','GeneID', 'GenBank_entry_mRNA', 'Mean', 'Median')
-
+mhc2.rna.select <- ct.df$mhc2.rna.select[ct.df$mhc2.rna.select != ""]
+mhc2.rna.rename <- ct.df$mhc2.rna.rename[ct.df$mhc2.rna.rename != ""]
+mhc2.rna.reorder <- ct.df$mhc2.rna.reorder[ct.df$mhc2.rna.reorder != ""]
+mhc2.tcga.select <- ct.df$mhc2.tcga.select[ct.df$mhc2.tcga.select != ""]
+mhc2.tcga.rename <- ct.df$mhc2.tcga.rename[ct.df$mhc2.tcga.rename != ""]
+mhc2.tcga.reorder <- ct.df$mhc2.tcga.reorder[ct.df$mhc2.tcga.reorder != ""]
 
 filter_tcga_RNAseq_mhc2 <- function(){
     file.mhci <- inputMHCII
@@ -170,13 +147,6 @@ filter_tcga_RNAseq_mhc2 <- function(){
                  (f4$BindLevel_mut == 'nonB' & f4$Aff.nM_mut <= 1000 ), ]
     
     if (tcga == 'RNAseq'){
-        geneID <- getBM(attributes = c("ensembl_gene_id", "external_gene_name"), 
-                        filters = "external_gene_name", 
-                        useCache = FALSE,
-                        values = f5$Gene,
-                        mart = old_mart)
-        colnames(geneID) <- c('geneID', 'Gene')
-        f5 <- merge(f5, geneID, by.x = 'Gene', by.y = 'Gene', all.x = TRUE)
         f6 <- f5[, mhc2.rna.reorder]
         f6 <- f6[!is.na(f5$Gene),]
         f6$freAlt <- as.numeric(as.character(f6$freAlt))
