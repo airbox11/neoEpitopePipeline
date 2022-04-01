@@ -607,16 +607,12 @@ all_in_one_pipeline -e netMHCpan4_1 -r MD45 -t RNAseq -s s3 -d debug
 ##
 all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s s1b -t RNAseq -d debug 
 all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s snv -t RNAseq
-	
-all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s s8a -t RNAseq -d debug 
 
-
-all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s indel -t RNAseq
-all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s i4c -t RNAseq -d debug
-
-
-all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s fusion -t RNAseq
-all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s f4 -t RNAseq -d debug
+	all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s s8a -t RNAseq -d debug 
+	all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s indel -t RNAseq
+	all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s i4c -t RNAseq -d debug
+	all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s fusion -t RNAseq
+	all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s f4 -t RNAseq -d debug
 
 
 
@@ -685,3 +681,143 @@ all_in_one_pipeline -r AA52 -t RNAseq -e netMHCpan4_1 -d debug
 
 
 
+## K26K-AT59U7
+all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s s3 -t RNAseq
+
+all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s indel -t RNAseq
+all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s fusion -t RNAseq
+all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s s8bi4cf4f5 -t RNAseq
+all_in_one_pipeline -e netMHCpan4_1 -r K26K-AT59U7 -s i4c -t RNAseq -d debug
+
+## promise 21 =================
+
+## run hla type
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s1b -r S014-9C2UWH_tumor12 -d debug
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s1b -r S014-NHGSH5_tumor11 -d debug
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s1b -r S014-E9NNVR_tumor11 -d debug
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s1b -r S014-FYVYBF_tumor11 -d debug
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s1b -r S014-AGLMAZ_tumor11 -d debug
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s1b -r S014-XTGWF2_tumor11 -d debug
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s1b -r S014-JALDBT_tumor11 -d debug
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s1b -r S014-BAJUW7_tumor11 -d debug
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s1b -r S014-6617PL_tumor11 -d debug
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s1b -r S014-UPSW7P_tumor11 -d debug
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s1b -r S014-VVXZ39_tumor11 -d debug
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s1b -r S014-ZNWXFT_tumor11 -d debug
+
+
+## run prediction
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-3SLKPB_tumor41 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-4LNKDY_tumor41 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-6617PL_tumor11 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-8B6PB4_tumor61 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-9C2UWH_tumor11 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-9C2UWH_tumor12 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-AGLMAZ_tumor11 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-BAJUW7_tumor11 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-E9NNVR_tumor11 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-FYVYBF_tumor11 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-JALDBT_tumor11 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-NHGSH5_tumor11 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-U8ETE8_tumor61 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-UFL1D9_tumor41 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-UPSW7P_tumor11 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-VVXZ39_tumor11 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-X3Q2S2_tumor31 -d debug
+all_in_one_pipeline -h promise -t RNAseq -e netMHCpan4_1 -s s0 -r S014-XTGWF2_tumor11 -d debug
+
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s0 -r S014-PQRN8X_tumor41 -d debug
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s0 -r S014-TC14F4_tumor41 -d debug
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s s0 -r S014-ZNWXFT_tumor11 -d debug
+
+
+## 2 catch patients 
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s i4cf5 -r K26K-JS49GN_metastasis11 -d debug
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s i4cf5 -r K26K-JS49GN_metastasis21 -d debug
+
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s snv -r H021-3W9ZP5_metastasis031
+
+
+
+##########################
+## K26K-P7V4JK-tumor21
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s s0 -r K26K-P7V4JK-tumor11 -d debug
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s s0 -r K26K-P7V4JK-tumor21 -d debug
+
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s s1b -r K26K-P7V4JK-tumor21
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s s1b -r K26K-P7V4JK-tumor11 -d debug
+
+
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s snv -r K26K-P7V4JK-tumor21
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s indel -r K26K-P7V4JK-tumor21
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s fusion -r K26K-P7V4JK-tumor21
+
+
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s snv -r K26K-P7V4JK-tumor11 &
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s indel -r K26K-P7V4JK-tumor11 &
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s fusion -r K26K-P7V4JK-tumor11 &
+
+
+all_in_one_pipeline -r K26K-P7V4JK-tumor21 -t RNAseq -e netMHCpan4_1 -s s8bi4cf4f5
+all_in_one_pipeline -r K26K-P7V4JK-tumor11 -t RNAseq -e netMHCpan4_1 -s s8bi4cf4f5
+
+
+## K1FZ3P
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s s0 -r K1FZ3P -d debug
+
+
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s s1b -r K1FZ3P -d debug
+
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s snv -r K1FZ3P &
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s indel -r K1FZ3P &
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s fusion -r K1FZ3P &
+
+
+
+## JS53 wait for odcf response
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s snv- -r JS53 -d debug
+
+all_in_one_pipeline -t TCGA-PRAD -e netMHCpan4_1 -s s3 -r JS53
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s indel -r JS53 &
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s fusion -r JS53 &
+
+
+## loh JS53
+all_in_one_pipeline -t RNAseq -e netMHCpan4_1 -s loh -r JS53 -d debug
+
+## loh on promise
+all_in_one_pipeline -h promise -t luad_lusc -e netMHCpan4_1 -s loh -r S014-9C2UWH_tumor12 -d debug
+
+
+## neo promise batch3 
+
+## neo SF67 
+all_in_one_pipeline -r SF67 -t RNAseq -e netMHCpan4_1 -d debug
+	all_in_one_pipeline -r SF67 -t RNAseq -e netMHCpan4_1 -s s1b
+	all_in_one_pipeline -r SF67 -t RNAseq -e netMHCpan4_1 -s s1b -d debug
+	all_in_one_pipeline -r SF67 -t RNAseq -e netMHCpan4_1 -s snv &
+	all_in_one_pipeline -r SF67 -t RNAseq -e netMHCpan4_1 -s indel &
+	all_in_one_pipeline -r SF67 -t RNAseq -e netMHCpan4_1 -s fusion &
+	all_in_one_pipeline -r SF67 -t RNAseq -e netMHCpan4_1 -d debug
+
+all_in_one_pipeline -r SF67 -t RNAseq -e netMHCpan4_1 -s cn -d debug
+
+
+## 98140 : MO79
+all_in_one_pipeline -r MO79 -d debug
+all_in_one_pipeline -r MO79 -s s1b -d debug
+all_in_one_pipeline -r MO79 -s snv 
+all_in_one_pipeline -r MO79 -s s8b -d debug
+
+all_in_one_pipeline -r MO79 -s indel
+all_in_one_pipeline -r MO79 -s f4f5 -d debug
+all_in_one_pipeline -r MO79 -s loh -d debug
+
+all_in_one_pipeline -r MO79 -s cn -d debug
+all_in_one_pipeline -r MO79 -s loh -d debug
+
+
+ 
+## LOH of K26K-P7V4JK
+all_in_one_pipeline  -r K26K-P7V4JK-tumor21 -s loh
+all_in_one_pipeline  -r K26K-P7V4JK-tumor11 -s loh
