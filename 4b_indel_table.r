@@ -4,10 +4,9 @@ library(biomaRt)
 args1 <- commandArgs(trailingOnly = TRUE)
 workDir <- args1[1]
 
-
 ### for test:
 # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/promise/output_datasets/S014-2CDKKU/'
-# workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/EB72'
+# workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/promise/output_datasets/S014-9C2UWH_T12_tumor12'
 ### test end
 setwd(paste(workDir,'4_indel_based_prediction/result',sep = '/'))
 
@@ -26,8 +25,20 @@ write(paste('gene', 'splice_state', 'ref/mut', 'sequence', sep = '\t'),append = 
 ## prepare long peps
 
 prepare_long_peps <- function(gene, type){
-  pep.long.ref <- readLines(paste(gene,'_refPeptide.fa', sep = ''))[2]
-  pep.long.mu <- readLines(paste(gene,'_targeted.fa', sep = ''))[2]
+  pep.long.ref <- NA
+  pep.long.mu <- NA
+  tryCatch(
+    expr = {
+      pep.long.ref <- readLines(paste(gene,'_refPeptide.fa', sep = ''))[2]
+      pep.long.mu <- readLines(paste(gene,'_targeted.fa', sep = ''))[2]
+    },
+    error = function(e){ 
+      print(paste('pep.long.ref: ' , pep.long.ref))
+      print(paste('pep.long.mu: ' , pep.long.ref))
+    }
+  )
+  if (is.na(pep.long.ref) | is.na(pep.long.mu) ) return(NA)
+
   file_long_pep <<- file_long_pep
   
   m <- 1
@@ -80,7 +91,7 @@ list2df <- function(l1){
   if (length(l1) < 2){
     tb <- rbind(tb, tb)
   }
-    tb <- data.frame(tb, stringsAsFactors=FALSE)
+  tb <- data.frame(tb, stringsAsFactors=FALSE)
   
   return(tb)
 }
@@ -119,6 +130,8 @@ get_tb <- function (type) {
   for (i in 1:length(genes)){
     gene <- genes[i]
     peps <- prepare_long_peps(gene, type)
+    if (is.na(peps)) next
+    
     pep.long.ref <- peps[1]
     pep.long.mu <- peps[2]
     
@@ -133,12 +146,11 @@ get_tb <- function (type) {
     l1 <-str_split(wt1[str_detect(wt1, pattern = '^(?=.*HLA).*<=')], pattern = '\\s+')
     l2 <-str_split((wt1[str_detect(wt1, pattern = '^(?!.*HLA).*<=')]), pattern = '\\s+')
     
-
-    
     ## functions  
     check_indel <- function(pep) {
       d.mu <- str_detect(pep.long.mu, pattern = pep)
       d.ref <- str_detect(pep.long.ref, pattern = pep)
+      
       if(type == 'mutant' & d.mu & !(d.ref)){
         return(TRUE)
       }else if(type == 'wildType' & d.ref){
@@ -146,6 +158,15 @@ get_tb <- function (type) {
       }else {
         return(FALSE)
       }
+      
+      # tryCatch(
+      #   expr = {
+      #   },
+      #   error = function(e){ 
+      #     print(paste('pep.long.mu: '))
+      #   }
+      # )
+      
     }
     
     mu_ref_classify <- function(tb1){
@@ -171,7 +192,9 @@ get_tb <- function (type) {
     }
     
     if (length(l2) > 0)  {
-      l2 <- remove_empty_column(l2, c(3:13))
+      c1 <- c(3,4,8,5,6,7,12,13,14,11,16)
+      # l2 <- remove_empty_column(l2, c(3:13))
+      l2 <- remove_empty_column(l2, c1)
       tb2 <- list2df(l2)
       tb2 <- mu_ref_classify(tb2)
       
@@ -187,7 +210,6 @@ get_tb <- function (type) {
   
   cols1 <- c('MHC','Peptide','Core','Of','Gp','Gl','Ip','Il','Icore','gene','Score_EL','%Rank_EL','Score_BA','%Rank_BA','Aff(nM)','BindLevel')
   cols2 <- c('Allele','Peptide','gene','Pos','Core','Core_Rel','1-log50k(aff)','Affinity(nM)','%Rank','Exp_Bind','BindingLevel')
-  
   if (!is.null(tb0.1)){
     tb0.1 <- add_colnames(tb0.1, cols1)
     write_to_file(tb0.1, type, 'MHCI')
@@ -208,6 +230,11 @@ indelInfo <- read.table(f2, stringsAsFactors = FALSE, sep = '\t',
                         comment.char = "",
                         header = TRUE
                         )[,c('POS', 'REF', 'ALT', 'ANNOVAR_FUNCTION', 'GENE')]
+print(dim(indelInfo))
+if (nrow(indelInfo)<1) {
+  stop('There are 0 line for indel prediction')
+}
+
 indelInfo$GENE <- str_match(indelInfo$GENE, pattern = '([^(]+)\\(?.*')[,2]
 colnames(indelInfo) <- c('indel_position','reference','mutation','genomic_location','gene')
 tb.geneID <- getBM(attributes = c("ensembl_gene_id", "external_gene_name"), 
