@@ -7,11 +7,11 @@ function usage() {
 
 	) -r: runID: 
 	] -e: netMHCpanID:
-		(both), netMHCpan4_1, netMHCstabpan
+		(netMHCpan4_1), netMHCstabpan, both
 	] -p: patientID:
 		($ runID)
 	] -t: tcga: 
-		(TCGA-READ), RNAseq
+		(RNAseq), TCGA-READ
 	) -s: steps: 
 		s0: prepare folder
 		s1a_HLA
@@ -35,10 +35,12 @@ function usage() {
 		f5: to_xlsx
 		fusion: all steps
 
+		cn: change name
+
 	] -d: debug: 
 		debug, empty
 	] -h: hlaID
-		(mhc), promise
+		(NCT_IP): NCT internal patient, promise
 	" 1>&2
 	exit 1
 	}
@@ -82,7 +84,7 @@ fi
 
 ## default value 
 if [ -z $netMHCpanID ]; then
-	netMHCpanID=both
+	netMHCpanID=netMHCpan4_1
 fi
 
 if [ -z $steps ]; then
@@ -94,11 +96,11 @@ if [ -z $patientID ]; then
 fi
 
 if [ -z $tcga ]; then
-	tcga=TCGA-READ
+	tcga=RNAseq
 fi
 
 if [ -z $hlaID ]; then
-	hlaID=mhc
+	hlaID=NCT_IP
 fi
 
 if [ -z $dataType ]; then
@@ -107,7 +109,7 @@ fi
 
 
 
-# script=/icgc/dkfzlsdf/analysis/D120/yanhong/all_in_one_pipeline/all_in_one_pipeline_0.sh
+
 script=/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline/all_in_one_pipeline_0.sh
 
 
@@ -116,7 +118,7 @@ if [ -z $debug ]; then
 	outputReport=/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/log/${PID}.log
 	rm -f $outputReport
 	env="all,runID=$runID,netMHCpanID=$netMHCpanID,patientID=$patientID,tcga=$tcga,steps=$steps,hlaID=$hlaID,dataType=$dataType"
-	bsub -u y.lyu@dkfz-heidelberg.de -o $outputReport -r -R "rusage[mem=10G]" -J $PID -W 50:00 -env "$env" -n 6 $script
+	bsub -u y.lyu@dkfz-heidelberg.de -o $outputReport -r -R "rusage[mem=10G]" -J $PID -W 50:00 -env "$env" -n 12 $script
 else
 	echo debug now '>>>>>>>>.'
 

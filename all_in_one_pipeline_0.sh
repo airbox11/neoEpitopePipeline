@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 set -e
 
 module load perl/5.24.1
@@ -17,8 +17,8 @@ arriba=/software/arriba/2.1.0/bin/arriba
 # indel vcf
 
 ## input parameters: ====
-dir1=/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1
-dir2=/omics/odcf/analysis/OE0422_projects/Immuno-Patients-NCT/sequencing/exon_sequencing/results_per_pid
+dir_work=/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1
+
 if [ $hlaID = promise ]; then
 
 	tumorID=`echo $runID | cut -d _ -f 2`
@@ -38,12 +38,14 @@ if [ $hlaID = promise ]; then
 		stage=T4
 	fi
 
-	workDir=$dir1/promise/output_datasets/${runID}_${stage}_${tumorID}
-	outputDir=$dir2/promise/$runID
+	dir_input=/omics/odcf/project/OE0422/promise/sequencing
+	workDir=$dir_work/promise/output_datasets/${runID}_${stage}_${tumorID}
+	outputDir=/omics/odcf/analysis/OE0422_projects/promise/results_per_pid_2/$runID
 
 else
-	workDir=$dir1/${runID}
-	outputDir=$dir2/$runID
+	dir_input=/omics/odcf/project/OE0422/immuno_patients_nct/sequencing
+	workDir=$dir_work/${runID}
+	outputDir=/omics/odcf/analysis/OE0422_projects/Immuno-Patients-NCT/sequencing/exon_sequencing/results_per_pid/$runID
 fi
 
 
@@ -56,7 +58,24 @@ scriptsDir=/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline
 
 ## SNV BASED PREIDCTION ====
 ## 0) prepare folder ====
+
+
+
+
 function prepare_folder () {
+	echo $workDir
+	# echo ${runID}_$tumorID
+	# ls -l --color $workDir/8*
+	# find $outputDir -type -f
+	# # exit 0
+
+
+	# dir_check=$outputDir/Epitope_prediction/snv_based/${stage}_${tumorID}
+	# echo $dir_check
+	# find $dir_check -type f | wc -l
+	# # ls -l --color=auto $outputDir/*
+	# exit 0
+
 	mkdir -p $workDir
 	mkdir -p $workDir/1_hla_type
 	mkdir -p $workDir/2_SNVs_based_neoepitope_prediction
@@ -74,60 +93,142 @@ function prepare_folder () {
 	mkdir -p $outputDir/Epitope_prediction/fusion_genes 
 	mkdir -p $outputDir/HLA/DKMS 
 	mkdir -p $outputDir/HLA/In_silico 
+	mkdir -p $outputDir/HLA/LOH
 	mkdir -p $outputDir/Gene_Expression
 
+
 	## creat link to mhc/runID:
-	sourceDir_s0=/icgc/dkfzlsdf/project/D120/immuno_patients_nct/sequencing
 
 	## rna input:
-	cd $sourceDir_s0/rna_sequencing/view-by-pid/IPNCT_${runID}
-	input1=tumor
-	if [ ! -d "$input1" ];then
-		ls 
-		read -p "Input Selection:" input1
+
+	if [ $hlaID = promise ]; then
+
+		echo ${runID}_${tumorID}
+		## prepare RNA bam file ======== ======== ========
+		tumorID_2=${tumorID}-01
+		dir_RNA=$dir_input/rna_sequencing/view-by-pid/${runID}/${tumorID_2}/paired/merged-alignment/.merging_0
+
+		if [[ $tcga == 'RNAseq' ]]; then
+			file1=`find $dir_RNA -name "*${runID}_merged.mdup.bam"| xargs -I {}  realpath {}`
+			file2=`find $dir_RNA -name '*fpkm_tpm.featureCounts.tsv'| xargs -I {}  realpath {}`
+
+			ln -sf $file1 $workDir/3_add_expression
+			ln -sf $file2 $workDir/3_add_expression
+		fi
+
+		dir_wgs=$dir_input/whole_genome_sequencing/view-by-pid/${runID}
+		## prepare WGS bam file for HLA-prediction ======== ======== ========
+		tumorID_index=`echo $tumorID | sed 's/tumor//'`
+
+		buffcoatID_1=buffy-coat${tumorID_index}-01
+		buffcoatID_2=buffy-coat11-01
+
+		if [ ! -d "${dir_wgs}/${buffcoatID_1}" ];then
+			if [ -d "${dir_wgs}/$buffcoatID_2" ];then
+				buffcoatID_1=$buffcoatID_2
+			else
+				ls -l
+				read -p "Input Selection for buffy-coat for ${runID}_${tumorID}:" buffcoatID_1
+			fi
+		fi
+
+		dir_wgs2=$dir_input/whole_genome_sequencing/view-by-pid/${runID}/$buffcoatID_1/paired/merged-alignment
+
+		file1=`find $dir_wgs2 -maxdepth 1 -name '*merged.mdup.bam'`
+		ln -sf $file1 $workDir/1_hla_type
+
+		## snv, indel ======== ======== ========
+		dir_snv=$dir_wgs/snv_results/paired/${tumorID_2}_${buffcoatID_1}
+		file1=`find ${dir_snv} -name '*somatic_functional_snvs_conf_8_to_10.vcf'`
+		ln -sf $file1 $workDir/2_SNVs_based_neoepitope_prediction
+
+		dir_indel=$dir_wgs/indel_results/paired/${tumorID_2}_${buffcoatID_1}
+		file1=`find ${dir_indel} -type f -name '*somatic_functional_indels_conf_8_to_10.vcf'`
+		ln -sf $file1 $workDir/4_indel_based_prediction
+
+		echo '>>>>>>>>>>>>>>> s0: prepare_folder: done'
+
+	else
+		dir_RNA=$dir_input/rna_sequencing/view-by-pid/IPNCT_${runID}
+		if [ -d $dir_RNA ];then
+			cd $dir_RNA
+			input1=tumor
+			if [ ! -d "$input1" ];then
+				ls 
+				read -p "Input Selection:" input1
+			fi
+			cd $input1/paired/merged-alignment/.merging_0
+			file1=`find . -name "*${runID}_merged.mdup.bam"| xargs -I {}  realpath {}`
+			file2=`find . -name '*fpkm_tpm.featureCounts.tsv'| xargs -I {}  realpath {}`
+
+			ln -sf $file1 $workDir/3_add_expression
+			ln -sf $file2 $workDir/3_add_expression
+		fi
+
+		## bam for HLA-prediction
+		cd $dir_input/exon_sequencing/view-by-pid/IPNCT_${runID}
+		input1=control
+		if [ ! -d "$input1" ];then
+			ls
+			read -p "Input Selection:" input1
+		fi
+		cd $input1/paired/merged-alignment/.merging_0
+
+		file1=`find . -name '*merged.mdup.bam'| xargs -I {}  realpath {}`
+		ln -sf $file1 $workDir/1_hla_type
+
+		## snv, indel
+		cd $dir_input/exon_sequencing/view-by-pid/IPNCT_${runID}
+
+		input1=snv_results
+		file1=`find . -name '*somatic_functional_snvs_conf_8_to_10.vcf'| xargs -I {}  realpath {}`
+		ln -sf $file1 $workDir/2_SNVs_based_neoepitope_prediction
+		# ls -tl $workDir/2_SNVs_based_neoepitope_prediction
+
+		input1=indel_results
+		file1=`find . -name '*somatic_functional_indels_conf_8_to_10.vcf'| xargs -I {}  realpath {}`
+		ln -sf $file1 $workDir/4_indel_based_prediction
+		# ls -tl $workDir/4_indel_based_prediction
+
+
+		echo $workDir
+		echo '>>>>>>>>>>>>>>> s0: prepare_folder: done'
 	fi
-
-	cd $input1/paired/merged-alignment/.merging_0
-	# ls | grep -P '^(?!.*chimeric).*mdup.bam$'
-	file1=`find . -name "*${runID}_merged.mdup.bam"| xargs -I {}  realpath {}`
-	file2=`find . -name '*fpkm_tpm.featureCounts.tsv'| xargs -I {}  realpath {}`
-
-	ln -sf $file1 $workDir/3_add_expression
-	ln -sf $file2 $workDir/3_add_expression
-	# ls -tl $workDir/3_add_expression
-
-
-
-	## bam for HLA-prediction
-	cd $sourceDir_s0/exon_sequencing/view-by-pid/IPNCT_${runID}
-	input1=control
-	if [ ! -d "$input1" ];then
-		ls 
-		read -p "Input Selection:" input1
-	fi
-	cd $input1/paired/merged-alignment/.merging_0
-
-	file1=`find . -name '*merged.mdup.bam'| xargs -I {}  realpath {}`
-	ln -sf $file1 $workDir/1_hla_type
-	# ls -tl $workDir/1_hla_type
-
-	## snv, indel
-	cd $sourceDir_s0/exon_sequencing/view-by-pid/IPNCT_${runID}
-
-	input1=snv_results
-	file1=`find . -name '*somatic_functional_snvs_conf_8_to_10.vcf'| xargs -I {}  realpath {}`
-	ln -sf $file1 $workDir/2_SNVs_based_neoepitope_prediction
-	# ls -tl $workDir/2_SNVs_based_neoepitope_prediction
-
-	input1=indel_results
-	file1=`find . -name '*somatic_functional_indels_conf_8_to_10.vcf'| xargs -I {}  realpath {}`
-	ln -sf $file1 $workDir/4_indel_based_prediction
-	# ls -tl $workDir/4_indel_based_prediction
-
-
 	echo $workDir
-	echo '>>>>>>>>>>>>>>> s0: prepare_folder: done'
+	ls -l --color=auto $workDir/*
 
+	## for CGI Mutation_analysis
+	rm -rf $workDir/1_hla_type/mutation.csv
+	find $workDir -name '*vcf' | xargs -I {} awk '(NR>1) { print $1, $2, $4, $5 }' {} >> $workDir/1_hla_type/mutation.csv
+	cp $workDir/1_hla_type/mutation.csv $outputDir/Mutation_analysis/CGI 
+
+}
+
+
+function rename_zip {
+	zipDir=$outputDir/zip
+	# rm -fr ${runID}.zip
+	rm -fr $outputDir/*.zip
+	rm -fr $zipDir
+	rsync -a $outputDir $zipDir 2>&1 > /dev/null
+
+
+	IFS=$'\n'
+	files=($(find $zipDir -type f))
+	unset IFS
+	for i in ${files[*]}
+	do
+		mv $i `echo $i | sed "s;^\(.*/\)\([^/]\+\)$;\1${runID}_\2;"` 
+	done
+
+	cd $zipDir/$runID
+	zip -r $outputDir/${runID}.zip *
+	cd -
+
+	rm -fr $zipDir
+	echo '>>>>>>>>>>>>>>> change name: done ]]]]]]]]]]]]]]]]]'
+	echo $outputDir
+	ls -l --color $outputDir
 }
 
 ## 1) HLA typing prediction ====
@@ -138,7 +239,7 @@ function s1a_HLA () {
 
 
 	if [ $hlaID = 'promise' ]; then
-		sourceDir=/icgc/dkfzlsdf/project/OE0422/promise/sequencing/whole_genome_sequencing/view-by-pid/$runID/buffy-coat*/paired/run*/sequence/
+		sourceDir=/omics/odcf/project/OE0422/promise/sequencing/whole_genome_sequencing/view-by-pid/$runID/buffy-coat*/paired/run*/sequence/
 
 	elif [ $hlaID = 'phlat_all' ]; then
 		sourceDir=$workDir/1_hla_type
@@ -187,31 +288,40 @@ function s1b_hla_sab () {
 
 
 	if [ $hlaID = 'promise' ]; then
-		sourceDir=/icgc/dkfzlsdf/project/OE0422/promise/sequencing/whole_genome_sequencing/view-by-pid/$runID/buffy-coat*/paired/merged-alignment
+		sourceDir=/omics/odcf/project/OE0422/promise/sequencing/whole_genome_sequencing/view-by-pid/$runID/buffy-coat*/paired/merged-alignment
 	else
 		sourceDir=$workDir/1_hla_type
 	fi
 
-	bam=`ls $sourceDir | grep -P '^(?!.*chimeric).*mdup.bam$'| xargs -I {} echo $sourceDir/{}`
-	ls $sourceDir | grep -P '^(?!.*chimeric).*mdup.bam$'| xargs -I {} echo $sourceDir/{}
-	bam=`realpath $bam`
 
-	## check if hla preidiction completed or not
-	# fodler_check=$workDir/1_hla_type/hla_sab_${runID}
-	# file_check=fodler_check
-	hlaFile=`find  $workDir/1_hla_type -name '*.result_formatted.tsv'`
-	if [ -z $hlaFile ];then
-		$script --control-dna-bam $bam --references $referenceDir --output $workDirHla --pid $PID --hla hla
-	else
-		less $hlaFile | sed -E 's/^([ABC].*)\t(.*)/HLA-\1\2/g' | sed -E 's/^(D.*)\t(.*):(.*)/\1_\2\3/g' > $workDir/1_hla_type/format_hla
-		cp $workDir/1_hla_type/format_hla $outputDir/HLA/In_silico
-		echo '>>>>>>>>>>>>>>> s1b: hla type: done'
+	## fing format_hla if exist, otherwise run hla-prediction
+	if [[ -f ${workDirHla}/format_hla ]];then
+		return 0
+	else 
+		format_hla=`find ${outputDir}/HLA -type f -name 'format_hla'`
+		echo $format_hla
 
-		## CGI Mutation_analysis
-		rm -rf $workDir/1_hla_type/mutation.csv
-		find $workDir -name '*vcf' | xargs -I {} awk '(NR>1) { print $1, $2, $4, $5 }' {} >> $workDir/1_hla_type/mutation.csv
-		cp $workDir/1_hla_type/mutation.csv $outputDir/Mutation_analysis/CGI 
+		if [[ -f $format_hla ]]; then
+			ln -fs $format_hla $workDir/1_hla_type
+		else
+			bam=`ls $sourceDir | grep -P '^(?!.*chimeric).*mdup.bam$'| xargs -I {} echo $sourceDir/{}`
+			bam=`realpath $bam`
+
+			## check if hla preidiction completed or not, fodler_check=$workDir/1_hla_type/hla_sab_${runID}
+
+			hlaFile=`find -L $workDir/1_hla_type -name '*.result_formatted.tsv'`
+			if [ -z $hlaFile ];then
+				echo " >>>>>>>>>>> >>>>>>>>>>> HLA prediction start"
+				$script --control-dna-bam $bam --references $referenceDir --output $workDirHla --pid $PID --hla hla
+			fi
+			less $hlaFile | sed -E 's/^([ABC].*)\t(.*)/HLA-\1\2/g' | sed -E 's/^(D.*)\t(.*):(.*)/\1_\2\3/g' > $workDir/1_hla_type/format_hla
+			if [ $hlaID != 'promise' ]; then
+				cp $workDir/1_hla_type/format_hla $outputDir/HLA/In_silico
+			fi
+			echo ' >>>>>>>>>>> >>>>>>>>>>> s1b: hla type: done'
+		fi
 	fi
+
 
 }
 
@@ -224,14 +334,13 @@ function s1b_hla_sab () {
 
 function s2_snv () {
 	if [ $hlaID = 'promise' ]; then
-		# vcf=`find /icgc/dkfzlsdf/project/OE0422/promise/sequencing/whole_genome_sequencing/view-by-pid/$runID -name 'snv*somatic_functional_snvs_conf_8_to_10.vcf' -printf "%T@\t%Tc %6k KiB %p\n" | sort -n | awk '{print $NF}' | tail -1`
-		vcf=`find /icgc/dkfzlsdf/project/OE0422/promise/sequencing/whole_genome_sequencing/view-by-pid/$runID -name "snv*somatic_functional_snvs_conf_8_to_10.vcf" | grep ${tumorID}-`
+		vcf=`find /omics/odcf/project/OE0422/promise/sequencing/whole_genome_sequencing/view-by-pid/$runID -name "snv*somatic_functional_snvs_conf_8_to_10.vcf" | grep ${tumorID}-`
 		format_hla=`find $outputDir -name "format_hla" | xargs realpath`
 		ln -fs $vcf $workDir/2_SNVs_based_neoepitope_prediction
 		ln -fs $vcf $outputDir/Mutation_analysis/snv/$stage_$tumorID
-		ln -fs $format_hla ${workDir}/1_hla_type/format_hla
-
-
+		if [ ! -f ${workDir}/1_hla_type/format_hla ]; then
+			ln -fs $format_hla ${workDir}/1_hla_type/format_hla
+		fi
 	fi
 
 	vcf=${workDir}/2_SNVs_based_neoepitope_prediction/*.vcf
@@ -302,6 +411,17 @@ function s3_rna () {
 function s8a_filter () {
 	script=$scriptsDir/8a_filter_neoepitode.r
 	Rscript $script $netMHCpanID $workDir $tcga
+
+	## rename columns ==== ==== 
+	cd $workDir/8_chose_neoepitode
+	IFS=$'\n'
+	files=($(find . -maxdepth 1 -name '*tab'))
+	unset IFS
+	for i in ${files[*]}
+	do
+		awk 'BEGIN{FS='\t'; OFS='\t'}{if (NR == 1) {gsub(" +","_",$0)}; print $0}' $i > ${i}_renameCol
+	done
+	cd -
 	echo '>>>>>>>>>>>>>>> s8a: filter: done'
 }
 
@@ -313,7 +433,7 @@ function s8b_xlsx_to_public (){
 		outputDir_snv=${outputDir}/Epitope_prediction/snv_based
 	fi
 	mkdir -p $outputDir_snv
-	Rscript ${scriptsDir}/convert_to_xlsx.r $workDir $outputDir_snv snv 
+	/tbi/software/x86_64/R/R-3.4.0/el7/bin/Rscript ${scriptsDir}/convert_to_xlsx.r $workDir $outputDir_snv snv
 	echo '>>>>>>>>>>>>>>> s8b: xlsx: done'
 }
 
@@ -323,8 +443,6 @@ function s8b_xlsx_to_public (){
 function i4a_indel_predict () {
 
 	if [ $hlaID = 'promise' ]; then
-		# vcf=`find /icgc/dkfzlsdf/project/OE0422/promise/sequencing/whole_genome_sequencing/view-by-pid/$runID -name 'indel*somatic_functional_indels_conf_8_to_10.vcf' -printf "%T@\t%Tc %6k KiB %p\n" | sort -n | awk '{print $NF}' | tail -1`
-
 		indel_source_dir=/omics/odcf/project/OE0422/promise/sequencing/whole_genome_sequencing/view-by-pid/$runID/indel_results/paired/$tumorID-*
 		vcf=`find $indel_source_dir -name 'indel*somatic_functional_indels_conf_8_to_10.vcf'| xargs realpath`
 		ln -fs $vcf $workDir/4_indel_based_prediction
@@ -370,7 +488,7 @@ function i4c_xlsx_to_public () {
 
 	mkdir -p $outputDir_indel
 
-	Rscript ${scriptsDir}/convert_to_xlsx.r $workDir $outputDir_indel indel
+	/tbi/software/x86_64/R/R-3.4.0/el7/bin/Rscript ${scriptsDir}/convert_to_xlsx.r $workDir $outputDir_indel indel
 	echo '>>>>>>>>>>>>>>> i4c: xlsx: done'
 }
 
@@ -475,7 +593,7 @@ function f1b_run_arriba () {
 function f2_prepare_HLA () {
 	script=/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline/fusion_arriba/prepare_HLA.r
 	Rscript $script $workDir $workDir92
-	echo '>>>>>>>>>>>>>>>  >>>>>>>>>>>>>>> s2: prepare_HLA: done'
+	echo '>>>>>>>>>>>>>>>  >>>>>>>>>>>>>>> f2: prepare_HLA: done'
 }
 
 ## step 3: ====
@@ -516,19 +634,23 @@ function f5_to_xlsx () {
 	else
 		outputDir_fusion=$outputDir/Epitope_prediction/fusion_genes
 	fi
-	
-	Rscript $script $workDir $outputDir_fusion $dataType
-	echo '>>>>>>>>>>>>>>>  >>>>>>>>>>>>>>> s4: to_xlsx: done'
+
+	/tbi/software/x86_64/R/R-3.4.0/el7/bin/Rscript $script $workDir $outputDir_fusion $dataType
+	echo '>>>>>>>>>>>>>>>  >>>>>>>>>>>>>>> f5: to_xlsx: done'
 }
 
 
 
 ## EXCUTION ====
 
+## prepare_folder ==== ====
 
 if echo $steps | grep -o s0; then
 	prepare_folder
 fi
+
+
+## format_hla  ==== ====
 
 if echo $steps | grep -o s1a; then
 	s1a_HLA
@@ -538,6 +660,7 @@ if echo $steps | grep -o s1b; then
 	s1b_hla_sab
 fi
 
+## snv ==== ====
 
 if echo $steps | grep -o s2; then
 	if [ $netMHCpanID = 'both' ]; then
@@ -558,28 +681,9 @@ if echo $steps | grep -o s8a; then
 	s8a_filter
 fi
 
-if echo $steps | grep -o s8b; then
-	s8b_xlsx_to_public
-fi
 
-if echo $steps | grep -o snv; then
-	# s1b_hla_sab
+### indel ==== ====
 
-	if [ $netMHCpanID = 'both' ]; then
-		netMHCpanID=netMHCpan4_1
-		s2_snv
-		netMHCpanID=netMHCstabpan
-		s2_snv
-	else
-		s2_snv
-	fi
-	s3_rna
-	s8a_filter
-	# s8b_xlsx_to_public
-
-fi
-
-### indel ====
 if echo $steps | grep -o i4a; then
 	i4a_indel_predict
 fi
@@ -588,30 +692,14 @@ if echo $steps | grep -o i4b; then
 	i4b_indel_tsv
 fi
 
-if echo $steps | grep -o i4c; then
-	i4c_xlsx_to_public
-fi
 
-
-
-
-
-if echo $steps | grep -o indel; then
-	i4a_indel_predict
-	i4b_indel_tsv
-	# i4c_xlsx_to_public
-fi
-
-
-## fusion ====
+## fusion ==== ====
 
 if echo $steps | grep -o f1a; then
-	# bsub -r -R "rusage[mem=100G]" -J ${runID}_arriba1a -W 250:00  -n 8 \
 	f1a_run_star_arriba
 fi
 
 if echo $steps | grep -o f1b; then
-	# bsub -r -R "rusage[mem=100G]" -J ${runID}_arriba1b -W 250:00  -n 8 \
 	f1b_run_arriba
 fi
 
@@ -627,16 +715,80 @@ if echo $steps | grep -o f4; then
 	f4_mer21
 fi
 
-if echo $steps | grep -o f5; then
-	# bsub -Ne -r -R "rusage[mem=1G]" -J ${runID}_s4 -W 50:00 \
-	f5_to_xlsx
+## snv, indel, fusion  ==== ====
+
+if echo $steps | grep -o snv; then
+	if [ $netMHCpanID = 'both' ]; then
+		netMHCpanID=netMHCpan4_1
+		s2_snv
+		netMHCpanID=netMHCstabpan
+		s2_snv
+	else
+		s2_snv
+	fi
+	s3_rna
+	s8a_filter
+fi
+
+if echo $steps | grep -o indel; then
+	i4a_indel_predict
+	i4b_indel_tsv
 fi
 
 if echo $steps | grep -o fusion; then
 	f1b_run_arriba
 	f2_prepare_HLA
 	f3_neo_prediction
-	# f4_mer21
-	# f5_to_xlsx
+	f4_mer21
 fi
 
+
+## lohhla ==== ====
+
+if echo $steps | grep -o loh; then
+	## run LOH ==== ==== 
+	bash ${scriptsDir}/loh_hla.sh $workDir $runID $tumorID
+
+	## merge with mhc results ==== ====
+	mhc_input=`find $workDir/8_chose_neoepitode -name 'MHCI_*renameCol' | xargs basename`
+	Rscript ${scriptsDir}/add_loh.r $workDir $mhc_input
+
+
+	## copy files to final /HLA/LOH ==== ====
+	if [ $hlaID = 'promise' ]; then
+		outputDir_loh=$outputDir/HLA/LOH/${stage}_${tumorID}
+	else
+		outputDir_loh=$outputDir/HLA/LOH
+	fi
+	echo $outputDir_loh
+	mkdir -p $outputDir_loh
+	cp $workDir/5_LOHHLA/example-out/*xls $workDir/5_LOHHLA/example-out/Figures/*pdf $outputDir_loh
+	ls -l --color $outputDir_loh
+fi
+
+
+## blast score ==== ==== 
+
+if echo $steps | grep -o blst; then
+	mhc_input=`find $workDir/8_chose_neoepitode -name 'MHCI_*loh' | xargs basename`
+	bash $scriptsDir/blast_score.sh $workDir $mhc_input
+	Rscript $scriptsDir/blast_score_mergeTable.r $workDir $mhc_input
+fi
+
+## align BLOSUM62 score ==== ==== 
+if echo $steps | grep -o abls; then
+	mhc_input=`find $workDir/8_chose_neoepitode -name 'MHCI_*loh' | xargs basename`
+	Rscript $scriptsDir/align_BL62_score.r $workDir $mhc_input
+fi
+
+## xlsx ==== ====
+if echo $steps | grep -o xlsx; then
+	s8b_xlsx_to_public
+	i4c_xlsx_to_public
+	f5_to_xlsx
+fi
+
+## change name , zip ==== ====
+if echo $steps | grep -o nz; then
+	rename_zip
+fi

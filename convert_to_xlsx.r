@@ -1,5 +1,5 @@
 library(stringr)
-library("xlsx")
+library(xlsx)
 options(warn = -1)
 # install.packages('xlsx')
 
@@ -15,8 +15,8 @@ if (length(args)==0) {
 }
 
 ## for test ===================
-# workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/promise/output_datasets_17/S014-3X4VS6_T1T2_tumor11'
-# output_dir <- '/omics/odcf/analysis/OE0422_projects/Immuno-Patients-NCT/sequencing/exon_sequencing/results_per_pid/promise/S014-3X4VS6/Epitope_prediction/snv_based/T1T2_tumor11'
+# workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/K26K-JS49GN_metastasis11'
+# output_dir <- '/omics/odcf/analysis/OE0422_projects/Immuno-Patients-NCT/sequencing/exon_sequencing/results_per_pid/K26K-JS49GN_metastasis11/Epitope_prediction/snv_based'
 # convertID <- 'snv'
 ## test end ....................
 
@@ -53,8 +53,8 @@ convert_main <- function(convertID) {
   if (convertID == 'snv'){
     inputDir <- paste(workDir, '8_chose_neoepitode', sep = '/')
     # file.input <- list.files(inputDir, pattern = '^MHC.*', full.names = TRUE)
-    file.input <- list.files(inputDir, full.names = TRUE)
-    file.input2 <- list.files(inputDir, full.names = FALSE)
+    file.input <- list.files(inputDir, full.names = TRUE, pattern="\\.")
+    file.input2 <- list.files(inputDir, full.names = FALSE, pattern="\\.")
     file.name <- str_match(file.input2, pattern = '(.*)\\.[tab|csv]')[,2]
     file.output <- paste(output_dir, '/',
                          file.name, '.xlsx', 
