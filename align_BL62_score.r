@@ -2,6 +2,7 @@ rm(list=ls())
 
 ## args ==== ====
 library(Biostrings)
+library(rlang)
 args = commandArgs(trailingOnly=TRUE)
 if (length(args)==0) {
   print('parameters needed for converting to xlsx')
@@ -11,8 +12,8 @@ if (length(args)==0) {
 }
 
 ## test ==== ====
-test <- TRUE
 test <- FALSE
+test <- TRUE
 if (test){
   workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/MO79'
   mhc_input <- 'MHCI_epitopes_RNAseq_netMHCpan4_1.tab_renameCol_loh'
@@ -24,40 +25,41 @@ data(list=c(aln_matrix),envir=.GlobalEnv)
 ## functions ==== ====
 
 parallel_run <- function(qur.mat, ref.mat){
-  if (nrow(qur.mat)==100){
-    df.maxScore <- get_max_score_single(qur.mat, ref.mat)
-  }else{
-    ## prpare time, log file
-    t1 <- proc.time()
-    # parallel.log <- '/home/lyuya/tmpodcf/parallel.log'
-    # parallel.log <- ''
-    # file.remove(parallel.log, showWarnings = FALSE)
-    
-    ## set cluster
-    num.cores <- nrow(qur.mat)
-    if (num.cores > 12) num.cores <- 12
-    cl <- parallel::makeCluster(num.cores)
-    doParallel::registerDoParallel(cl)
-
-    ## export variable
-    parallel::clusterExport(cl, varlist=ls(.GlobalEnv), envir=.GlobalEnv)
-
-    ## parallel run
-    df.maxScore <- parallel::parApply(cl, qur.mat, 1,
-                               function(x) get_max_score_single(x, ref.mat)
-                               )
-    
-    ## convert to data.frame
-    df.maxScore.lite <- data.frame(t(df.maxScore))
-    colnames(df.maxScore.lite) <- c('qur.pep.seq', 'ref.pep.seq', 'score')
-    rownames(df.maxScore.lite) <- c(1:nrow(df.maxScore.lite))
-    
-    ## close cluster
-    print(paste0("Alignment Time : ", (proc.time() - t1)[3]))
-    parallel::stopCluster(cl)
+  
+  if (nrow(qur.mat) == 1){
+    df.maxScore <- get_max_score(qur.mat, ref.mat)
+    return(df.maxScore)
   }
-
-  # df.maxScore <- get_max_score_single(qur.mat[1,], ref.mat)
+  
+  ## prpare time, log file
+  t1 <- proc.time()
+  # parallel.log <- '/home/lyuya/tmpodcf/parallel.log'
+  # parallel.log <- ''
+  # file.remove(parallel.log, showWarnings = FALSE)
+  
+  ## set cluster
+  num.cores <- nrow(qur.mat)
+  if (num.cores > 12) num.cores <- 12
+  cl <- parallel::makeCluster(num.cores)
+  doParallel::registerDoParallel(cl)
+  
+  ## export variable
+  parallel::clusterExport(cl, varlist = ls(.GlobalEnv), envir = .GlobalEnv)
+  
+  ## parallel run
+  df.maxScore <- parallel::parApply(cl, qur.mat, 1,
+                                    function(x)
+                                      get_max_score_single(x, ref.mat))
+  
+  parallel::stopCluster(cl)
+  print(paste0("Alignment Time : ", (proc.time() - t1)[3]))
+  
+  ## convert to data.frame
+  df.maxScore.lite <- data.frame(t(df.maxScore))
+  colnames(df.maxScore.lite) <-
+    c('qur.pep.seq', 'ref.pep.seq', 'score')
+  rownames(df.maxScore.lite) <- c(1:nrow(df.maxScore.lite))
+  
   return(df.maxScore.lite)
 }
 
@@ -71,31 +73,44 @@ main_run <- function(){
   ## input reference ====
   # rFile <- '/omics/groups/OE0422/internal/yanhong/git/hex/unipro/hpv_reviewed_sequences_all_subtypes.csv_fasta'
   # rFile <- '/omics/groups/OE0422/internal/yanhong/git/hex/virus_bac_database/sequences_human_virus_freseq_all.fasta'
-  rFile <- '/omics/groups/OE0422/internal/yanhong/git/hex/virus_bac_database/sequences_human_virus_freseq_all.fasta_36'
+  # rFile <- '/omics/groups/OE0422/internal/yanhong/git/hex/virus_bac_database/sequences_human_virus_freseq_all.fasta_3'
+  # rFile <- '/omics/groups/OE0422/internal/yanhong/git/hex/virus_bac_database/hav_1.fasta'
+  file.matrix <- '/omics/groups/OE0422/internal/yanhong/git/hex/virus_bac_database/splice_py/sequences_human_virus_freseq_all.fasta_seq_matrix'
+
 
   ## input query ====
   qFile <- file.path(input.dir, mhc_input)
   qFile <- paste0(qFile, '_query.fa')
+  # qFile <- '/omics/groups/OE0422/internal/yanhong/git/20220406_paula_hex_test/mart1.fa'
   
   ## get max score table ====
-  # align to every length, without window drifting
+  # align to every length, without window sliding
   df.maxScore.allLength <- data.frame(matrix(ncol = 3, nrow = 0))
   colnames(df.maxScore.allLength) <- c('qur.pep.seq', 'ref.pep.seq', 'score')
   query.length <-sort(unique(nchar(readLines(qFile)[c(FALSE,TRUE)])))
   
   for (i in query.length){
-  # for (i in 9:10){
-    qur.mat <- get_matrix(qFile, window.width = i, mask = TRUE)
-    ref.mat <- get_matrix(rFile, window.width = i)
+  # for (i in 9:9){
+    ## prepare qur matrix
+    qur.mat <- get_matrix_query(qFile, window.width = i)
     
-    # # df.maxScore <- get_max_score(qur.mat, ref.mat)
-    # df.maxScore.lite <- df.maxScore[,-2]
+    ## prepare ref matrix
+    file.matrix1 <- paste0(file.matrix, '_', i)
+    # ref.mat <- read.table(file.matrix1, sep = '\t', stringsAsFactors = FALSE, header = FALSE)
+    # saveRDS(ref.mat, file = paste0(file.matrix1, '.rdata'))
     
+    # ref.mat <- readRDS(paste0(file.matrix1, '.rdata'))[1:100,]
+    ref.mat <- readRDS(paste0(file.matrix1, '.rdata'))
+    
+    
+    ## get max score and seq
+    t1 <- proc.time()
+    # df.maxScore <- get_max_score(qur.mat, ref.mat)
     df.maxScore.lite <- parallel_run(qur.mat, ref.mat)
+    print(paste0("Alignment Time : ", (proc.time() - t1)[3]))
+    
 
-    ## remove duplicates
-    df.maxScore.lite2 <- df.maxScore.lite[!duplicated(df.maxScore.lite), ]
-    df.maxScore.allLength <- rbind(df.maxScore.allLength, df.maxScore.lite2)
+    df.maxScore.allLength <- rbind(df.maxScore.allLength, df.maxScore.lite)
   }
   
   colnames(df.maxScore.allLength) <- c('Mutant_peptide','alignBL62_ref_seq','alignBL62_score')
@@ -113,49 +128,40 @@ main_run <- function(){
 }
 
 ##
-get_max_score <- function(qur.mat, ref.mat){
-  df1 <- data.frame(matrix(ncol = 4, nrow = 0))
-  colnames(df1) <- c('qur.pep.seq', 'ref.pep.name', 'ref.pep.seq', 'score')
 
+get_max_score_single <- function(qur.pep, ref.mat){
+  # df1 <- data.frame(matrix(ncol = 3, nrow = 0))
+  # colnames(df1) <- c('qur.pep.seq', 'ref.pep.seq', 'score')
+  
+  vec1 <- c()
+  seq.score <- align_to_ref_epitopes(qur.pep, ref.mat)
+  qur.pep.seq <- paste(qur.pep, collapse='')
+  # df1[nrow(df1) + 1,] = list(qur.pep.seq, seq.score[1], seq.score[2])
+  
+  vec1 <- c(qur.pep.seq, seq.score[1], seq.score[2])
+  return(vec1)
+}
+
+get_max_score <- function(qur.mat, ref.mat){
+  df1 <- data.frame(matrix(ncol = 3, nrow = 0))
+  colnames(df1) <- c('qur.pep.seq', 'ref.pep.seq', 'score')
+  
   for (i in 1:nrow(qur.mat)){
     qur.pep <- qur.mat[i,]
-    scores <- align_to_ref_epitopes(qur.pep, ref.mat)
-
+    seq.score <- align_to_ref_epitopes(qur.pep, ref.mat)
+    
     qur.pep.seq <- paste(qur.pep, collapse='')
-    max_score <- max(scores)
-
-    max_index <- which(scores == max_score)
-    for (j in max_index){
-      ref.pep.name <- names(scores)[j]
-      ref.pep.seq  <- paste(ref.mat[j,], collapse='')
-      df1[nrow(df1) + 1,] = list(qur.pep.seq, ref.pep.name, ref.pep.seq, max_score)
-    }
+    df1[nrow(df1) + 1,] = list(qur.pep.seq, seq.score[1], seq.score[2])
   }
   return(df1)
 }
 
-get_max_score_single <- function(qur.pep, ref.mat){
-  # df1 <- data.frame(matrix(ncol = 4, nrow = 0))
-  # colnames(df1) <- c('qur.pep.seq', 'ref.pep.name', 'ref.pep.seq', 'score')
-  
-  scores <- align_to_ref_epitopes(qur.pep, ref.mat)
-  qur.pep.seq <- paste(qur.pep, collapse='')
-  max_score <- max(scores)
-  
-  max_index <- which(scores == max_score)[1]
-  ref.pep.name <- names(scores)[max_index]
-  ref.pep.seq  <- paste(ref.mat[max_index,], collapse='')
-  vec1 <- c(qur.pep.seq, ref.pep.seq, max_score)
-  return(vec1)
-}
 
 
 ##
-get_matrix <- function (file.input, window.width, mask = FALSE){
+get_matrix_query <- function (file.input, window.width){
   aaSet <- readAAStringSet(file.input, format = "fasta")
-  if(mask){
-    aaSet <- aaSet[nchar(aaSet)==window.width]
-  }
+  aaSet <- aaSet[nchar(aaSet)==window.width]
   
   df1 <- data.frame(matrix(ncol = 2, nrow = 0))
   colnames(df1) <- c('pep.name', 'pep.seq')
@@ -163,7 +169,6 @@ get_matrix <- function (file.input, window.width, mask = FALSE){
     sequence <-  as.character(aaSet[[i]])
     query.name <- names(aaSet)[i]
 
-  # for (j in 1:5){
     for (j in 1: (nchar(sequence)-window.width+1)){
       seq.sub <- substr(sequence, j, (j+window.width-1))
       pep.name <- paste(query.name, seq.sub, sep='_')
@@ -171,57 +176,33 @@ get_matrix <- function (file.input, window.width, mask = FALSE){
     }
   }
   vec <- stats::setNames(df1$pep.seq, df1$pep.name)
-  # if (mask){
-  #   vec <- mask_short_sequence(vec, window.width)
-  # }
-
   aaSet.sub <- Biostrings::AAStringSet(vec)
   mat <- Biostrings::as.matrix(aaSet.sub, use.names = T)
   return(mat)
 }
 
-mask_short_sequence <- function(vec, window.width){
-  c1 <- c()
-  for (i in 1:length(vec)){
-    if (nchar(vec[i])!=window.width){
-      c1 <- c(c1,i)
-    }
-  }
-  vec2 <- vec[-c1]
-  return(vec2)
+
+
+
+align_to_ref_epitopes <- function(qurSeq, ref, mag = 4) {
+  aln_matrix_solid <- get(aln_matrix, envir = .GlobalEnv)
+  xPosWt <- get_pos_weights(qurSeq, mag)
+  
+  vec1 <- apply(ref, 1, function(x) get_score(x, qurSeq, xPosWt, aln_matrix_solid))
+  max.score <- max(vec1)
+  max.index <- which(vec1==max.score)[[1]]
+  refSeq <- paste0(ref[max.index,], collapse = '')
+
+  return(c(refSeq, max.score))
 }
 
-
-## 
-align_to_ref_epitopes <- function(x, ref, mag = 4 ) {
-  aln_matrix_solid <- get(aln_matrix, envir=.GlobalEnv) 
-  xPosWt <- get_pos_weights(x, mag)
-  xLen <- length(x)
-  
-  xAlnScoreVec <- c()
-  if (is.matrix(ref)) {
-    refSeqCount <- nrow(ref)
-    } else if (is.character(ref)) {
-      refSeqCount <- 1
-    }
-    else{
-      stop("Unsupported object as ref. Must be either matrix or character")
-    }
-
-    for (i in 1:refSeqCount){
-      xAlnScore <- 0
-      refSeq <- ref[i, ]
-      refName <- rownames(ref)[i]
-
-      xAlnMat <- diag(aln_matrix_solid[x, refSeq])
-      xAlnAmp <- xPosWt * xAlnMat
-      xAlnScore <- sum(xAlnAmp)
-
-      xAlnScoreVec[i] <- xAlnScore
-      names(xAlnScoreVec)[i] <- refName
-    }
-    return(xAlnScoreVec)
-  }
+get_score <- function (refSeq, qurSeq, xPosWt, aln_matrix_solid) {
+  xAlnScore <- 0
+  xAlnMat <- diag(aln_matrix_solid[qurSeq, refSeq])
+  xAlnAmp <- xPosWt * xAlnMat
+  xAlnScore <- sum(xAlnAmp)
+  return (xAlnScore)
+}
 
 ##
 
