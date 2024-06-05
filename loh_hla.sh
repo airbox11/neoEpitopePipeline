@@ -55,6 +55,13 @@ function link_bam {
 		cd $dir_tumor
 		lnqk *bam $workDir5/example-file/bam/example_tumor_sorted.bam
 		lnqk *bam.bai $workDir5/example-file/bam/example_tumor_sorted.bam.bai
+		cd -
+	fi
+
+	if [ ! -f $workDir5/example-file/bam/example_BS_GL_sorted.bam ] | [ ! -f $workDir5/example-file/bam/example_tumor_sorted.bam ]; then
+		echo '>>>> >>>> Error: no file exist for loh analysis.'
+		echo 'loh_stop=1' >> $file_run_status
+		exit 0
 	fi
 
 }
@@ -120,7 +127,7 @@ echo '=================================== start loh '
 # 	echo $workDir
 # fi
 
-link_bam
+# link_bam
 hla_data
 run_loh
 

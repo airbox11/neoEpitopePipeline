@@ -817,7 +817,388 @@ all_in_one_pipeline -r MO79 -s cn -d debug
 all_in_one_pipeline -r MO79 -s loh -d debug
 
 
+all_in_one_pipeline  -r MO79 -s blav -d debug
  
 ## LOH of K26K-P7V4JK
 all_in_one_pipeline  -r K26K-P7V4JK-tumor21 -s loh
 all_in_one_pipeline  -r K26K-P7V4JK-tumor11 -s loh
+
+
+
+## MASTER cs86
+all_in_one_pipeline -r CS86 -s s1b
+all_in_one_pipeline -r CH80 -s s1b
+
+all_in_one_pipeline -r CS86 -s snv
+all_in_one_pipeline -r CH80 -s snv
+
+
+## K26K-P7V4JK
+all_in_one_pipeline -r  -d debug
+
+
+## K1FZ3P
+all_in_one_pipeline -r K1FZ3P -s s3 -d debug
+
+
+#############
+
+## K26K-TQ77H3-wes-metastasis11
+all_in_one_pipeline -t TCGA-BRCA -r K26K-TQ77H3-wes-metastasis11 -d debug
+all_in_one_pipeline -t TCGA-BRCA -r K26K-TQ77H3-wes-metastasis11 -s s1b 
+all_in_one_pipeline -t TCGA-BRCA -r K26K-TQ77H3-wes-metastasis11 -s snv 
+all_in_one_pipeline -t TCGA-BRCA -r K26K-TQ77H3-wes-metastasis11 -s indel 
+
+all_in_one_pipeline -t TCGA-BRCA -r K26K-TQ77H3-wes-metastasis11 -s s3 -d debug
+
+all_in_one_pipeline -t TCGA-BRCA -r K26K-TQ77H3-wes-metastasis11 -s xlsx -d debug
+all_in_one_pipeline -t TCGA-BRCA -r K26K-TQ77H3-wes-metastasis11 -s nz -d debug
+
+
+
+## H021-KQQR2Q-metastasis05
+all_in_one_pipeline -r H021-KQQR2Q-metastasis05 -d debug
+all_in_one_pipeline -r H021-KQQR2Q-metastasis05 -s s1b 
+
+all_in_one_pipeline -r H021-KQQR2Q-metastasis05 -s snv &
+all_in_one_pipeline -r H021-KQQR2Q-metastasis05 -s indel &
+all_in_one_pipeline -r H021-KQQR2Q-metastasis05 -s fusion &
+all_in_one_pipeline -r H021-KQQR2Q-metastasis05 -s xlsx -d debug
+all_in_one_pipeline -r H021-KQQR2Q-metastasis05 -s nz -d debug
+
+
+
+## H021-QXVLHV-metastasis04
+all_in_one_pipeline -r H021-QXVLHV-metastasis04 -d debug
+all_in_one_pipeline -r H021-QXVLHV-metastasis04 -s s1b
+
+all_in_one_pipeline -r H021-QXVLHV-metastasis04 -s snv &
+all_in_one_pipeline -r H021-QXVLHV-metastasis04 -s indel &
+all_in_one_pipeline -r H021-QXVLHV-metastasis04 -s fusion &
+
+
+
+## AW58
+all_in_one_pipeline -r AW58 -d debug
+all_in_one_pipeline -r AW58 -s s1b
+
+## MW78
+all_in_one_pipeline -r MW78 -d debug
+all_in_one_pipeline -r MW78 -s s1b
+
+all_in_one_pipeline -r MW78 -s xlsx -d debug
+
+## MD48
+all_in_one_pipeline -t TCGA-PAAD -r MD48 -d debug
+all_in_one_pipeline -t TCGA-PAAD -r MD48 -s s3 -d debug
+all_in_one_pipeline -r MD48 -s xlsx -d debug
+
+## 237
+all_in_one_pipeline -r  EB61  -t TCGA-OV -d debug
+
+all_in_one_pipeline -r P980 -d debug
+all_in_one_pipeline -r GH72 -d debug
+all_in_one_pipeline -r MK55 -d debug
+all_in_one_pipeline -r HB81 -d debug
+all_in_one_pipeline -r SVB75 -d debug
+all_in_one_pipeline -r AW58 -d debug
+
+
+## K26K-P7V4JK meta1
+all_in_one_pipeline -r K26K-P7V4JK_meta1  -d debug
+
+
+# K9665
+all_in_one_pipeline -r K9665  -d debug
+all_in_one_pipeline -r K9665 -s s1b
+all_in_one_pipeline -r K9665 -t TCGA-COAD -s s3s8as8b
+all_in_one_pipeline -r K9665 -s indel
+all_in_one_pipeline -r K9665 -s nz -d debug
+
+
+
+# K9665_original_snv
+all_in_one_pipeline -r K9665_originalSnv  -d debug
+all_in_one_pipeline -r K9665_originalSnv -t TCGA-COAD -s snv 
+all_in_one_pipeline -r K9665_originalSnv -t TCGA-COAD -s s8a -d debug
+
+
+all_in_one_pipeline -r K9665 -t TCGA-COAD -s loh -d debug
+
+all_in_one_pipeline -r K9665_originalSnv -t TCGA-COAD -s nz -d debug
+
+
+# 
+all_in_one_pipeline -r LS62  -d debug
+all_in_one_pipeline -r LS62 -s snv 
+
+## 
+all_in_one_pipeline -r LM86  -d debug
+
+## BAD60
+all_in_one_pipeline -r BAD60 -t luad_lusc -s snv
+
+## poc1 
+
+all_in_one_pipeline -r EH63_cell-line01 -s nz -d debug
+all_in_one_pipeline -r EH63_metastasis2 -s nz -d debug
+all_in_one_pipeline -r EH63_metastasis3 -s nz -d debug
+all_in_one_pipeline -r EH63_primary -s nz -d debug
+all_in_one_pipeline -r EH63_tumor -s nz -d debug
+all_in_one_pipeline -r EH63_xenograft1 -s nz -d debug
+all_in_one_pipeline -r EH63_xenograft2 -s nz -d debug
+
+## 
+all_in_one_pipeline -r H021-UKY79T -s s1b
+all_in_one_pipeline -r H021-RK6XZV_tumor -s s1b -d debug
+all_in_one_pipeline -r H021-RK6XZV_tumor02 -s s1b
+
+all_in_one_pipeline -r H021-RK6XZV_tumor04 -d debug
+
+## poc003
+all_in_one_pipeline -r poc003 -s s1b
+
+## 6 NCT patients
+
+all_in_one_pipeline -r AK74 -s xlsx_nz -d debug 
+all_in_one_pipeline -r GB42 -s xlsx_nz -d debug 
+all_in_one_pipeline -r KV65 -s xlsx_nz -d debug 
+all_in_one_pipeline -r MF67 -s xlsx_nz -d debug 
+all_in_one_pipeline -r MH73 -s xlsx_nz -d debug 
+all_in_one_pipeline -r TS73_tumor02 -s xlsx_nz -d debug 
+all_in_one_pipeline -r K26K-P7V4JK_meta01 -s xlsx_nz -d debug 
+
+##
+
+all_in_one_pipeline -r RMN50 -d debug 
+
+
+## 2022.11.07
+all_in_one_pipeline -r AL52 -d debug 
+all_in_one_pipeline -r BK70 -d debug 
+all_in_one_pipeline -r JM63 -d debug 
+
+all_in_one_pipeline -r HSK48 -d debug 
+
+
+###
+
+
+# find ~/omics/EH63_metastasis2 ~/omics/EH63_primary ~/omics/EH63_tumor ~/omics/H021-S4CLSR ~/omics/EH63_cell-line01 ~/omics/EH63_metastasis3 ~/omics/EH63_xenograft1 ~/omics/EH63_xenograft2 ~/omics/H021-UKY79T ~/omics/poc003 ~/omics/H021-RK6XZV_tumor ~/omics/H021-RK6XZV_tumor02 ~/omics/H021-RK6XZV_tumor04 -type f | xargs -I {} ls -l {}
+
+all_in_one_pipeline -r EH63_metastasis2 -t TCGA-READ -s xlsx-nz 
+all_in_one_pipeline -r EH63_primary -t TCGA-READ -s xlsx-nz 
+all_in_one_pipeline -r EH63_tumor -t TCGA-READ -s xlsx-nz 
+all_in_one_pipeline -r H021-S4CLSR -s xlsx-nz 
+
+all_in_one_pipeline -r EH63_cell-line01 -s xlsx-nz 
+all_in_one_pipeline -r EH63_metastasis3 -s xlsx-nz 
+all_in_one_pipeline -r EH63_xenograft1 -s xlsx-nz 
+all_in_one_pipeline -r EH63_xenograft2 -s xlsx-nz 
+all_in_one_pipeline -r H021-UKY79T -s xlsx-nz 
+all_in_one_pipeline -r poc003 -s xlsx-nz 
+all_in_one_pipeline -r H021-RK6XZV_tumor -s xlsx-nz 
+all_in_one_pipeline -r H021-RK6XZV_tumor02 -s xlsx-nz 
+all_in_one_pipeline -r H021-RK6XZV_tumor04 -s xlsx-nz 
+
+##
+
+all_in_one_pipeline -r BT60 -t TCGA-UCEC -d debug
+all_in_one_pipeline -r GH71 -d debug
+all_in_one_pipeline -r BS74 -d debug
+all_in_one_pipeline -r WW46 -d debug
+
+all_in_one_pipeline -r SH55 -d debug
+all_in_one_pipeline -r SF82 -d debug
+
+##
+
+all_in_one_pipeline -r SH55_tumor -s fusion
+all_in_one_pipeline -r SH55_tumor02 -s fusion
+all_in_one_pipeline -r AJ63_tumor05 -d debug
+
+
+all_in_one_pipeline -r TLS80 -t TCGA-COAD -d debug
+##
+all_in_one_pipeline -r PC63 -s s1b -d debug
+all_in_one_pipeline -r SF82 -d debug
+
+
+##
+all_in_one_pipeline -r SaN65 -s fusion
+all_in_one_pipeline -r AL52_tumor02 -s fusion
+all_in_one_pipeline -r LF89_tumor02 -s fusion
+
+all_in_one_pipeline -r AJ63_liver300X -d debug
+
+
+## 
+
+all_in_one_pipeline -r JB73 -s s1b -d debug
+all_in_one_pipeline -r HO66 -s s1b -d debug
+
+## 
+all_in_one_pipeline -r LF89_tumor02 -s xlsx -d debug
+all_in_one_pipeline -r LF89 -s xlsx -d debug
+
+## 
+all_in_one_pipeline -r JH59 -d debug
+all_in_one_pipeline -r AA57 -d debug
+
+all_in_one_pipeline -r AA57 -t TCGA-PAAD -s s8a
+
+all_in_one_pipeline -r JH59 -s nz -t TCGA-BLCA -d debug
+all_in_one_pipeline -r CA59 -s nz -t TCGA-PAAD -d debug
+
+##
+all_in_one_pipeline -r AW88 -t TCGA-COAD -s snv
+
+
+## 
+
+all_in_one_pipeline -h promise -r S014-2NHL7W_tumor11_wgs_RNAseq -d debug
+
+## 
+all_in_one_pipeline  -r K9665 -s loh -d debug
+all_in_one_pipeline  -r K9665_tumor2 -s xlsx -d debug
+
+
+
+## 
+all_in_one_pipeline -r BK60 -d debug
+
+all_in_one_pipeline -r TS73_tumor03 -t TCGA-COAD -s snv
+
+
+
+##  fusion for ca59
+all_in_one_pipeline -r CA59 -s f2 -d debug
+all_in_one_pipeline -r JH59 -s f2 -d debug
+
+## ts73
+
+all_in_one_pipeline -r TS73_tumor03 -s xlsx -d debug
+
+all_in_one_pipeline -r TLS80_tumor2 -t TCGA-COAD -d debug
+
+## 
+all_in_one_pipeline -r uv54 -t TCGA-PRAD -d debug -s snv
+
+
+## 
+
+all_in_one_pipeline -r RK66 -s xlsx -d debug
+
+##
+all_in_one_pipeline -r VM73 -s snv
+
+## 
+all_in_one_pipeline -r ES60 -t TCGA-COAD -s s3 
+all_in_one_pipeline -r ES60 -t TCGA-COAD -s s1b 
+
+
+all_in_one_pipeline -r MT68 -s s3 -d debug
+
+
+## 
+
+all_in_one_pipeline -r LP91 -s s3 -t TCGA-TGCT -d debug
+
+
+
+## 
+
+all_in_one_pipeline -r HDK59  -s loh
+all_in_one_pipeline -r NH72  -s loh
+all_in_one_pipeline -r K26K-ZWJDB4 -s loh
+all_in_one_pipeline -r WW46_tumor02 -t TCGA-SKCM -s loh
+all_in_one_pipeline -r ET76 -t TCGA-BRCA -s loh
+
+#
+all_in_one_pipeline -r LP91 -s i4a -d debug
+all_in_one_pipeline -r LP91 -s s2 -d debug
+all_in_one_pipeline -r HDK59  -s i4a -d debug
+
+
+## 
+5 odcf process
+2 vcf process
+arriba on vm 
+immuX
+hipo34 paper
+gene_name_change_list
+ask sven about fusion duel name
+
+
+download 115024.21/22
+upload   115024.21/22; 118612
+
+
+## 
+
+all_in_one_pipeline -t RNAseq    -c pa   -r GW46  -s snv-indel-fusion-xlsx
+all_in_one_pipeline -t TCGA-BRCA -c brca -r RVK75 -s snv-indel-fusion-xlsx
+all_in_one_pipeline -t RNAseq    -c PL   -r SMI80 -s snv-indel-fusion-xlsx
+all_in_one_pipeline -t RNAseq    -c R    -r MTK72 -s snv-indel-fusion-xlsx
+all_in_one_pipeline -t RNAseq    -c sg   -r SH82  -s snv-indel-fusion-xlsx
+
+## 
+
+all_in_one_pipeline -t TCGA-BRCA -r RVK75 -c brca -s s2 -d debug
+
+## 
+all_in_one_pipeline -t TCGA-READ -r JG48 -d debug
+all_in_one_pipeline -t TCGA-LUAD -r NKH82 -d debug
+
+
+##
+
+all_in_one_pipeline  -r HaK67 -d debug
+all_in_one_pipeline  -r GS42 -d debug -s s2 -d debug
+
+
+all_in_one_pipeline -r BK70 -c brca -s c1-c2 -d debug
+
+##
+
+all_in_one_pipeline -r KW81         -t TCGA-MESO_RNAseq -c meso -s c1 
+
+## 
+all_in_one_pipeline -r IE67         -t TCGA-COAD -c coc -s s0 -d debug
+all_in_one_pipeline -r IE67         -t TCGA-COAD -c coc -s xlsx -b Yes
+
+all_in_one_pipeline -r JAS62        -t TCGA-PAAD -c pa -s s0 -b Yes -d debug
+all_in_one_pipeline -r JAS62        -t TCGA-PAAD -c pa -s snv -b Yes
+
+all_in_one_pipeline -r MO64 -s f5 -d debug
+
+
+
+all_in_one_pipeline -r MB65  -t TCGA-PAAD -c paad  -b yes -s s1b -d debug
+all_in_one_pipeline -r MN80  -t TCGA-PAAD -c paad  -b yes -s s1b -d debug
+all_in_one_pipeline -r IW62  -t TCGA-PAAD -c paad  -b yes -s s1b -d debug
+all_in_one_pipeline -r MK66  -t TCGA-READ -c read  -b yes -s s1b -d debug
+all_in_one_pipeline -r cDA75 -t TCGA-OV   -c ov    -b yes -s s1b -d debug
+all_in_one_pipeline -r FS69  -t TCGA-LUSC -c nsclc -b yes -s s1b -d debug
+## 
+all_in_one_pipeline -r H021-3TZJZW -t TCGA-LUSC_RNAseq -c uvm -s s0 -d debug 
+
+##
+all_in_one_pipeline -r K50K-QEQ5DD -t TCGA-BRCA_RNAseq -c brca -s xlsx
+
+## 
+
+all_in_one_pipeline -r P122886 -t TCGA-COAD_RNAseq -c coc -s s0 -d debug
+
+
+all_in_one_pipeline -r MR80 -t TCGA-COAD -c coc -s s2 -b Yes -d debug
+
+all_in_one_pipeline -r YP81 -t TCGA-COAD -c coc -s s2 -b Yes -d debug
+
+all_in_one_pipeline -r 29056 -t TCGA-KIRP -c r -s indel -b Yes
+all_in_one_pipeline -r 19714 -t TCGA-PAAD -c paad -s indel -b Yes
+
+
+## 
+all_in_one_pipeline -r P124838 -t TCGA-PAAD -c paad -s s0 -d debug
+all_in_one_pipeline -r BM44 -t TCGA-READ_RNAseq -c read -s s2 -d debug

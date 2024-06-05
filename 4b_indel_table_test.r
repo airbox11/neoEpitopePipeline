@@ -1,15 +1,14 @@
 library(stringr)
 library(biomaRt)
-vcfOnly <- Sys.getenv('vcfOnly')
 
 args1 <- commandArgs(trailingOnly = TRUE)
 workDir <- args1[1]
 
   ### for test:
+  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/FS75'
+  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/YP81'
   # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/40002'
-  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/promise/batch_process_20230302/result/S014-2CDKKU_T1T2_tumor11'
-  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/p005144'
-  # vcfOnly <- 'promise'
+  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/40002'
   
   ### test end
 
@@ -226,13 +225,9 @@ get_tb <- function (type) {
 }
 
 
-if (vcfOnly=='promise' || vcfOnly=='pathology') {
-  f2 <- '1.vcf'
-} else {
-  f2 <- list.files('../', pattern = '.*somatic.*vcf$')
-  f2 <- paste('../', f2, sep = '')
-}
-
+# f2 <- list.files('../', pattern = '.*somatic_functional_indels_conf_8_to_10.vcf')
+f2 <- list.files('../', pattern = '.*somatic.*vcf$')
+f2 <- paste('../', f2, sep = '')
 # debug
 indelInfo <- read.table(f2, stringsAsFactors = FALSE, sep = '\t',
                         fill = TRUE,
@@ -247,73 +242,31 @@ if (length(c1[!c1%in%names(indelInfo)]) > 0) {
 }
 indelInfo <- indelInfo[,c1]
 
+# [,c('X.CHROM','POS', 'REF', 'ALT', 'ANNOVAR_FUNCTION', 'GENE')]
+
+# indelInfo <- read.table(f2, stringsAsFactors = FALSE, sep = '\t',
+#                         fill = TRUE,
+#                         comment.char = "",
+#                         header = TRUE
+# )[,c('X.CHROM','POS', 'REF', 'ALT', 'GENE')]
 
 print(dim(indelInfo))
 if (nrow(indelInfo)<1) {
   stop('There are 0 line for indel prediction')
 }
 
-get_geneID <- function (df1) {
-  old_mart <- useEnsembl(biomart = "ensembl", 
-                         dataset = "hsapiens_gene_ensembl")
-  attributes <- c("ensembl_gene_id", "hgnc_symbol")
-  filters <- c("chromosome_name","start","end")
-  df1$geneID <- NA
-  
-  for (i in 1:nrow(df1)){
-    chr <- df1[i,]$X.CHROM
-    chr <- str_match(chr, pattern = '(chr)?(.*)')[,3]
-    pos <- as.character(df1[i,]$POS)
-    values <- list(chromosome=chr,start=pos,end=pos)
-    
-    tryCatch(
-      expr = {
-        all.genes <- getBM(attributes=attributes, filters=filters, values=values, mart=old_mart, useCache = FALSE)
-        if (nrow(all.genes)==1) {
-          df1[i,]$geneID <- all.genes$ensembl_gene_id
-          df1[i,]$GENE <- all.genes$hgnc_symbol
-        } else {
-          all.genes <- all.genes[order(all.genes$hgnc_symbol, decreasing = TRUE),]
-          df1[i,]$geneID <- all.genes[1,]$ensembl_gene_id
-          df1[i,]$GENE <- all.genes[1,]$hgnc_symbol
-        }
-      },
-      error = function(e){ 
-        print('debug')
-      }
-    )
-  }
-  colnames(df1) <- c('chr','pos','reference','mutation','genomic_location','gene', 'ensembl_gene_id')
-  return(df1)
-}
-
-if (vcfOnly == 'promise') {
-  file.rds <- 'indelInfo.rdata'
-  if (file.exists(file.rds)) {
-    indelInfo <- readRDS(file = file.rds)
-  } else {
-    indelInfo <- get_geneID(indelInfo)
-    saveRDS(indelInfo, file = file.rds)
-  }
-} else if (vcfOnly=='pathology' | vcfOnly == 'origin') {
-  indelInfo$GENE <- str_match(indelInfo$GENE, pattern = '([^(]+)\\(?.*')[,2]
-  colnames(indelInfo) <- c('chr','pos','reference','mutation','genomic_location','gene')
-  tb.geneID <- getBM(attributes = c("ensembl_gene_id", "external_gene_name"),
-                     filters = "external_gene_name",
-                     values = as.character(indelInfo$gene),
-                     useCache = FALSE,
-                     # values = 'AOAH',
-                     # verbose = TRUE,
-                     # uniqueRows = FALSE,
-                     # mart = ensembl)
-                     mart = old_mart)
-  indelInfo <- merge(indelInfo, tb.geneID, by.x = 'gene', by.y = 'external_gene_name', all.x = TRUE)
-}
-
-
-
-
-
+indelInfo$GENE <- str_match(indelInfo$GENE, pattern = '([^(]+)\\(?.*')[,2]
+colnames(indelInfo) <- c('chr','pos','reference','mutation','genomic_location','gene')
+tb.geneID <- getBM(attributes = c("ensembl_gene_id", "external_gene_name"), 
+                   filters = "external_gene_name", 
+                   values = as.character(indelInfo$gene),
+                   useCache = FALSE,
+                   # values = 'AOAH',
+                   # verbose = TRUE,
+                   # uniqueRows = FALSE,
+                   # mart = ensembl)
+                   mart = old_mart)
+indelInfo <- merge(indelInfo, tb.geneID, by.x = 'gene', by.y = 'external_gene_name', all.x = TRUE)
 
 ## output:
 
