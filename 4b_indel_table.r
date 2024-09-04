@@ -6,10 +6,8 @@ args1 <- commandArgs(trailingOnly = TRUE)
 workDir <- args1[1]
 
   ### for test:
-  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/40002'
-  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/promise/batch_process_20230302/result/S014-2CDKKU_T1T2_tumor11'
-  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/p005144'
-  # vcfOnly <- 'promise'
+  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/OE0370_CRC_4267_pdo01_germline01'
+  # vcfOnly <- 'origin'
   
   ### test end
 
@@ -103,9 +101,14 @@ list2df <- function(l1){
   return(tb)
 }
 
-remove_empty_column <- function(l1,c1){
+remove_empty_column <- function(l1,c1,sb){
   for (i in 1:length(l1)){
-    l1[[i]] <- l1[[i]][c1]
+    if (length(l1[[i]]) == sb){
+      l1[[i]] <- l1[[i]][c(c1,sb)]
+    }else{
+      l1[[i]] <- c(l1[[i]][c1],'.')
+    }
+    
   }
   return(l1)
 }
@@ -150,9 +153,6 @@ get_tb <- function (type) {
     if (!file.exists(wt)) next
     
     wt1 <- readLines(wt)
-    # l1 <-str_split(wt1[str_detect(wt1, pattern = '^(?=.*HLA).*<=')], pattern = '\\s+')
-    # l2 <-str_split((wt1[str_detect(wt1, pattern = '^(?!.*HLA).*<=')]), pattern = '\\s+')
-    
     l1 <-str_split(wt1[str_detect(wt1, pattern = '\\s+\\d+\\s+HLA-.*')], pattern = '\\s+')
     l2 <-str_split((wt1[str_detect(wt1, pattern = '\\s+\\d+\\s+DRB._.*')]), pattern = '\\s+')
     
@@ -183,7 +183,7 @@ get_tb <- function (type) {
     
     ## execution
     if (length(l1) > 0)  {
-      l1 <- remove_empty_column(l1, c(3:17))
+      l1 <- remove_empty_column(l1, c(3:17), 19)
       tb1 <- list2df(l1)
       tb1 <- mu_ref_classify(tb1)
       if (is.null(tb0.1)){
@@ -195,8 +195,7 @@ get_tb <- function (type) {
     
     if (length(l2) > 0)  {
       c1 <- c(3,4,8,5,6,7,9,10,12,13,14)
-      # l2 <- remove_empty_column(l2, c(3:13))
-      l2 <- remove_empty_column(l2, c1)
+      l2 <- remove_empty_column(l2, c1,16)
       tb2 <- list2df(l2)
       tb2 <- mu_ref_classify(tb2)
       
@@ -210,8 +209,8 @@ get_tb <- function (type) {
     
   }
     
-  cols1 <- c('MHC','Peptide','Core','Of','Gp','Gl','Ip','Il','Icore','gene','Score_EL','Rank_EL','Score_BA','Rank_BA','Aff.nM')
-  cols2 <- c('Allele','Peptide','gene','Pos','Core','Core_Rel','Score_EL', 'Rank_EL','Score_BA','Affinity.nM','Rank_BA')
+  cols1 <- c('MHC','Peptide','Core','Of','Gp','Gl','Ip','Il','Icore','gene','Score_EL','Rank_EL','Score_BA','Rank_BA','Aff.nM',paste0('BindLevel_',type))
+  cols2 <- c('Allele','Peptide','gene','Pos','Core','Core_Rel','Score_EL', 'Rank_EL','Score_BA','Affinity.nM','Rank_BA',paste0('BindLevel_',type))
   if (!is.null(tb0.1)){
     tb0.1 <- add_colnames(tb0.1, cols1)
     write_to_file(tb0.1, type, 'MHCI')
@@ -302,22 +301,11 @@ if (vcfOnly == 'promise') {
                      filters = "external_gene_name",
                      values = as.character(indelInfo$gene),
                      useCache = FALSE,
-                     # values = 'AOAH',
-                     # verbose = TRUE,
-                     # uniqueRows = FALSE,
-                     # mart = ensembl)
                      mart = old_mart)
   indelInfo <- merge(indelInfo, tb.geneID, by.x = 'gene', by.y = 'external_gene_name', all.x = TRUE)
 }
 
-
-
-
-
-
 ## output:
-
-
 get_tb('wildType')
 get_tb('mutant')
 

@@ -9,12 +9,10 @@ if (length(args) == 2){
   vcfOnly <- args[2]
 }
 ## test ====
-  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/promise/batch_process_20230302/result/S014-1HBNPG_T1T2_tumor11/2_SNVs_based_neoepitope_prediction'
-  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/promise/batch_process_20230302/result/S014-2NHL7W_T1T2_tumor11/2_SNVs_based_neoepitope_prediction'
-  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/P132761/2_SNVs_based_neoepitope_prediction'
+  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/OE0370_CRC_4251_pdo01_germline01/2_SNVs_based_neoepitope_prediction'
 
-  # vcfOnly <- 'promise'
   # vcfOnly <- 'origin'
+  # vcfOnly <- 'promise'
 
 ## test end
 

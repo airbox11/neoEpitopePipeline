@@ -12,8 +12,8 @@ tcga <- args1[3]
 ## for test: =========================
 # netMHCpanID <- 'netMHCpan4_1'
 
-  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/promise/batch_process_20230302/result/S014-2NHL7W_T1T2_tumor11'
-  # tcga <- 'TCGA-luad-lusc_RNAseq'
+  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/P013521'
+  # tcga <- 'TCGA-HNSC_RNAseq'
 
   # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/p005144'
   # tcga <- 'TCGA-COAD'
@@ -30,7 +30,8 @@ inputMHCII <- paste(workDir, '/3_add_expression/MHCII_epitopes_', tcga, '.tab', 
 
 columns_table <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline/columns_table_2.csv'
 
-ct.df <- read.table(file = columns_table, sep = '\t', header = TRUE, stringsAsFtttactors = FALSE, fill = TRUE)
+ct.df <- read.table(file = columns_table, sep = '\t', header = TRUE, stringsAsFactors = FALSE, fill = TRUE)
+# ct.df <- read.table(file = columns_table, sep = '\t', header = TRUE, fill = TRUE)
 
 old_mart <- useMart(biomart="ENSEMBL_MART_ENSEMBL",
                     host="grch37.ensembl.org",
