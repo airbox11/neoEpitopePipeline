@@ -6,7 +6,7 @@ args1 <- commandArgs(trailingOnly = TRUE)
 workDir <- args1[1]
 
   ### for test:
-  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/OE0370_CRC_4267_pdo01_germline01'
+  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/P104472_tumor01'
   # vcfOnly <- 'origin'
   
   ### test end
@@ -238,7 +238,7 @@ indelInfo <- read.table(f2, stringsAsFactors = FALSE, sep = '\t',
                         comment.char = "",
                         header = TRUE
                         )
-c1 <- c('X.CHROM','POS', 'REF', 'ALT', 'ANNOVAR_FUNCTION', 'GENE')
+c1 <- c('X.CHROM','POS', 'REF', 'ALT', 'ANNOVAR_FUNCTION', 'GENE','ANNOVAR_TRANSCRIPTS')
 if (length(c1[!c1%in%names(indelInfo)]) > 0) {
   for (col1 in c1[!c1%in%names(indelInfo)]){
     indelInfo[[col1]] <- NA
@@ -282,7 +282,7 @@ get_geneID <- function (df1) {
       }
     )
   }
-  colnames(df1) <- c('chr','pos','reference','mutation','genomic_location','gene', 'ensembl_gene_id')
+  colnames(df1) <- c('chr','pos','reference','mutation','genomic_location','gene', 'ensembl_gene_id', 'ANNOVAR_TRANSCRIPTS')
   return(df1)
 }
 
@@ -296,7 +296,7 @@ if (vcfOnly == 'promise') {
   }
 } else if (vcfOnly=='pathology' | vcfOnly == 'origin') {
   indelInfo$GENE <- str_match(indelInfo$GENE, pattern = '([^(]+)\\(?.*')[,2]
-  colnames(indelInfo) <- c('chr','pos','reference','mutation','genomic_location','gene')
+  colnames(indelInfo) <- c('chr','pos','reference','mutation','genomic_location','gene', 'ANNOVAR_TRANSCRIPTS')
   tb.geneID <- getBM(attributes = c("ensembl_gene_id", "external_gene_name"),
                      filters = "external_gene_name",
                      values = as.character(indelInfo$gene),

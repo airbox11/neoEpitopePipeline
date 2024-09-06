@@ -19,23 +19,23 @@ BindLevel.1	BindLevel_wt	Rank_BA_wt	NM_accessions	GenBank_entry_mRNA	Rank_BA_wt	
 NM_accessions	GenBank_entry_mRNA	Aff.nM_wt	aaChange	aaChange	Aff.nM_wt	dna_freAlt	dna_freAlt	Epi_pos_in_longpep	CHROM	CHROM	Epi_pos_in_longpep	Thalf.h..1	Thalf.h_wt	Pred_wt	X.Rank_Stab.1	Rank_Stab_wt	Identity_wt
 aaChange	aaChange	BindLevel_wt	geneID	geneID	BindLevel_wt	dna_cov	dna_cov	geneID	POS	POS	geneID	X.Rank_Stab.1	Rank_Stab_wt	Thalf.h_wt	X1.log50k.1	log50k_wt	Pred_wt
 TPM	TPM	Epi_pos_in_longpep	Mean	Mean	Epi_pos_in_longpep	freRef	freRef	GenBank_entry_mRNA	Hydrophobic_GRAVY	Hydrophobic_GRAVY	GenBank_entry_mRNA	X1.log50k.1	log50k_wt	Rank_Stab_wt	Aff.nM..1	Aff.nM_wt	Thalf.h_wt
-FPKM	FPKM	Mutant_long_peptide	Median	Median	Mutant_long_peptide	freAlt	freAlt	TPM			Mean	Aff.nM..1	Aff.nM_wt	log50k_wt	X.Rank_aff.1	Rank_aff_wt	Rank_Stab_wt
+FPKM	FPKM	Mutant_long_peptide	Median	Median	Mutant_long_peptide	freAlt	freAlt	TPM	ANNOVAR_TRANSCRIPTS	ANNOVAR_TRANSCRIPTS	Mean	Aff.nM..1	Aff.nM_wt	log50k_wt	X.Rank_aff.1	Rank_aff_wt	Rank_Stab_wt
 sumReads	sumReads	WildType_long_peptide	CHROM	CHROM	WildType_long_peptide	expAlt	expAlt	FPKM			Median	X.Rank_aff.1	Rank_aff_wt	Aff.nM_wt	Combined.1	Combined_wt	log50k_wt
 numOfBaseExp	numOfBaseExp	geneID	POS	POS	geneID	TPM	TPM	sumReads			CHROM	Combined.1	Combined_wt	Rank_aff_wt	Combined_.rank.1	Combined_rank_wt	Aff.nM_wt
-dna_freAlt	dna_freAlt	GenBank_entry_mRNA	hydro_GRAVY	hydro_GRAVY	GenBank_entry_mRNA	FPKM	FPKM	numOfBaseExp			POS	Combined_.rank.1	Combined_rank_wt	Combined_wt	BindLevel.1	BindLevel_wt	Rank_aff_wt
-dna_cov	dna_cov	TPM			Mean	Mean	Mean	dna_freAlt			Hydrophobic_GRAVY	BindLevel.1	BindLevel_wt	Combined_rank_wt	NM_accessions	GenBank_entry_mRNA	Combined_wt
-freRef	freRef	FPKM			Median	Median	Median	dna_cov				NM_accessions	GenBank_entry_mRNA	BindLevel_wt	aaChange	aaChange	Combined_rank_wt
+dna_freAlt	dna_freAlt	GenBank_entry_mRNA	Hydrophobic_GRAVY	Hydrophobic_GRAVY	GenBank_entry_mRNA	FPKM	FPKM	numOfBaseExp			POS	Combined_.rank.1	Combined_rank_wt	Combined_wt	BindLevel.1	BindLevel_wt	Rank_aff_wt
+dna_cov	dna_cov	TPM	ANNOVAR_TRANSCRIPTS	ANNOVAR_TRANSCRIPTS	Mean	Mean	Mean	dna_freAlt			Hydrophobic_GRAVY	BindLevel.1	BindLevel_wt	Combined_rank_wt	NM_accessions	GenBank_entry_mRNA	Combined_wt
+freRef	freRef	FPKM			Median	Median	Median	dna_cov			ANNOVAR_TRANSCRIPTS	NM_accessions	GenBank_entry_mRNA	BindLevel_wt	aaChange	aaChange	Combined_rank_wt
 freAlt	freAlt	sumReads			CHROM	CHROM	CHROM	freRef				aaChange	aaChange	Mut_pos_epitope	geneID	geneID	BindLevel_wt
 expAlt	expAlt	numOfBaseExp			POS	POS	POS	freAlt				sumReads	sumReads	Epi_pos_in_longpep	Mean	Mean	Epi_pos_in_longpep
 Mean	Mean	dna_freAlt			Hydrophobic_GRAVY	Hydrophobic_GRAVY	Hydrophobic_GRAVY	expAlt				numOfBaseExp	numOfBaseExp	Mutant_long_peptide	Median	Median	Mutant_long_peptide
-Median	Median	dna_cov						Mean				dna_freAlt	dna_freAlt	WildType_long_peptide			WildType_long_peptide
+Median	Median	dna_cov			ANNOVAR_TRANSCRIPTS	ANNOVAR_TRANSCRIPTS	ANNOVAR_TRANSCRIPTS	Mean				dna_freAlt	dna_freAlt	WildType_long_peptide			WildType_long_peptide
 CHROM	CHROM	freRef						Median				dna_cov	dna_cov	geneID			geneID
 POS	POS	freAlt						CHROM				freRef	freRef	GenBank_entry_mRNA			GenBank_entry_mRNA
 Hydrophobic_GRAVY	Hydrophobic_GRAVY	expAlt						POS				freAlt	freAlt	FPKM			Mean
-		Mean						Hydrophobic_GRAVY				expAlt	expAlt	sumReads			Median
-		Median												numOfBaseExp			
+ANNOVAR_TRANSCRIPTS	ANNOVAR_TRANSCRIPTS	Mean						Hydrophobic_GRAVY				expAlt	expAlt	sumReads			Median
+		Median						ANNOVAR_TRANSCRIPTS						numOfBaseExp			
 		CHROM												dna_freAlt			
 		POS												dna_cov			
 		Hydrophobic_GRAVY												freRef			
-														freAlt			
+		ANNOVAR_TRANSCRIPTS												freAlt			
 														expAlt			

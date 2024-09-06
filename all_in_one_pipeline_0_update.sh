@@ -452,13 +452,6 @@ function rename_zip {
 		cp $file_fusion_mutation $dir_omics_fusion/fusions_splitGenes.tsv
 	fi
 
-	if [ -f $workDir/3_add_expression/*featureCounts.tsv ]; then
-		rm -rf $outputDir/Gene_Expression/*featureCounts.tsv
-		cp $workDir/3_add_expression/*tsv $outputDir/Gene_Expression/featureCounts.tsv
-	fi
-
-
-
 	echo '=== ===> rename_zip: start...'
 	zipDir=$outputDir/zip
 	# rm -fr ${runID}.zip
@@ -808,8 +801,6 @@ function s3_rna () {
 		outputFile=$workDir/8_chose_neoepitode/wish_list_genes_expression.csv
 		Rscript $script $expression $outputFile
 
-		cat $workDir/3_add_expression/*fpkm_tpm.featureCounts.tsv > $outputDir/Gene_Expression/${runID}_${tumorID}_fpkm_tpm.featureCounts.tsv
-
 	fi
 
 	if [[ `echo $tcga | grep -oi 'tcga' | wc -l` == 1 ]] || [[ `echo $tcga | grep -oi 'target' | wc -l` == 1 ]]; then
@@ -888,11 +879,14 @@ function s8b_xlsx_to_public (){
 	fi
 	rm -rf $outputDir_snv
 	mkdir -p $outputDir_snv
-	/tbi/software/x86_64/R/R-3.4.0/el7/bin/Rscript ${scriptsDir}/convert_to_xlsx.r $workDir $outputDir_snv snv
+	# /tbi/software/x86_64/R/R-3.4.0/el7/bin/Rscript ${scriptsDir}/convert_to_xlsx.r $workDir $outputDir_snv snv
 
 	## convert wishList to xlsx file
 	if [ `echo $tcga | grep 'RNAseq' | wc -l` == 1 ];then
+		rm -rf $outputDir/Gene_Expression/wishList.xlsx
 		inputFile=$workDir/8_chose_neoepitode/wish_list_genes_expression.csv
+		# /tbi/software/x86_64/R/R-3.4.0/el7/bin/Rscript /omics/groups/OE0422/internal/yanhong/all_in_one_pipeline/convert_to_xlsx.r $inputFile $outputDir/Gene_Expression wishList
+		inputFile=$workDir/3_add_expression/*fpkm_tpm.featureCounts.tsv
 		/tbi/software/x86_64/R/R-3.4.0/el7/bin/Rscript /omics/groups/OE0422/internal/yanhong/all_in_one_pipeline/convert_to_xlsx.r $inputFile $outputDir/Gene_Expression wishList
 	fi
 }
@@ -1043,7 +1037,20 @@ function i4b_indel_tsv () {
 	fi
 	echo '=== ===> i4b_indel_tsv: start...'
 	script=/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline/4b_indel_table.r
-	Rscript $script $workDir
+	# Rscript $script $workDir
+
+
+	script=/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline/update_netMHCpan/netMHCpan_4.1/hydro.py
+	cd $workDir/4_indel_based_prediction
+	IFS=$'\n'
+	files=($(find . -maxdepth 1 -name 'indel*MHC*tsv'))
+	unset IFS
+	for i in ${files[*]}
+	do
+		python $script $i
+		mv ${i}.hydro $i
+	done
+	cd -
 
 }
 

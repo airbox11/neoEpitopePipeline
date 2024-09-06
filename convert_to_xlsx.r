@@ -17,25 +17,18 @@ if (length(args)==0) {
 
 
   ## for test ===================
-  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/promise/batch_process_20230302/result/S014-VT1D4H_T1T2_tumor11'
-  # output_dir <- '/omics/odcf/analysis/OE0422_projects/promise/results_per_pid_2/S014-VT1D4H/Epitope_prediction/snv_based/T1T2_tumor11'
-  # convertID <- 'snv'
-  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/p005144'
-
-# output_dir <- '/omics/odcf/analysis/OE0422_projects/Immuno-Patients-NCT/sequencing/exon_sequencing/results_per_pid/p005144/Epitope_prediction/indel_based'
-# convertID <- 'indel'
-
-  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/promise/batch_process_20230302/result/S014-2CDKKU_T1T2_tumor11'
-  # output_dir <- '/omics/odcf/analysis/OE0422_projects/promise/promise_hg38/S014-2CDKKU/Epitope_prediction/snv_based/T1T2_tumor11'
-  # convertID <- 'snv'
   
+  # workDir <- '/omics/groups/OE0422/internal/yanhong/all_in_one_pipeline_collection/mhc4.1/P133952_tumor02/3_add_expression/tumor02_IPNCT_P133952.fpkm_tpm.featureCounts.tsv'
+  # output_dir <- '/omics/odcf/analysis/OE0422_projects/Immuno-Patients-NCT/sequencing/exon_sequencing/results_per_pid/P133952_tumor02/Gene_Expression'
+  # convertID <- 'wishList'
 
-  ## test end ....................
+  ## test end  ===================
 
 ## functions ====
 
 convert_to_xls <- function(file.input, file.output){
-  t1 <- read.table(file.input, header = TRUE, row.names = NULL, sep = '\t', stringsAsFactors = FALSE, quote="")
+  # t1 <- read.table(file.input, header = TRUE, row.names = NULL, sep = '\t', stringsAsFactors = FALSE, quote="")
+  t1 <- read.table(file.input, header = TRUE, sep = '\t', stringsAsFactors = FALSE, comment.char = "")
 
   if (nrow(t1)>0){
 
@@ -74,8 +67,9 @@ convert_main <- function(convertID) {
                          sep = '')
   }else if(convertID %in% c('wishList' ,'fusionsTsv')){
     file.input <- workDir
-    file.output <- paste0(output_dir, '/', convertID, '.xlsx')
+    file.output <- paste0(output_dir, '/', basename(file.input), '.xlsx')
     print(file.input)
+    print(file.output)
   }
   mapply(convert_to_xls, file.input, file.output)
 }
